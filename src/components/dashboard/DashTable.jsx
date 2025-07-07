@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   fetchDataDashboard,
   getOrderStatus,
   getResourceTypeLabel,
+  statusUpdate,
 } from "../../lib/helpers";
 import { FiMapPin } from "react-icons/fi";
 import SkeletonTable from "../Loaders/SkeletonTable";
@@ -10,6 +11,7 @@ import TableTabs from "./tabs/TableTabs";
 import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
 import { RiExpandUpDownLine } from "react-icons/ri";
+import ContextApi from "../../context/ContextApi";
 
 export default function DashTable() {
   const [filteredData, setFilteredData] = useState([]);
@@ -18,6 +20,7 @@ export default function DashTable() {
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState(null); // 'asc' | 'desc' | null
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const { socketData } = useContext(ContextApi);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +46,10 @@ export default function DashTable() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    statusUpdate(filteredData, setFilteredData, socketData);
+  }, [socketData]);
 
   const isAllSelected =
     filteredData.length > 0 && selectedIds.length === filteredData.length;
