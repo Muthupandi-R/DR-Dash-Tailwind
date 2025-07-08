@@ -21,7 +21,17 @@ export default {
           800: colors.indigo[800],
         },
       },
+       keyframes: {
+        slideIn: {
+          "0%": { opacity: 0, transform: "translateX(100%)" },
+          "100%": { opacity: 1, transform: "translateX(0)" },
+        },
+      },
+      animation: {
+        slideIn: "slideIn 0.4s ease-out",
+      },
     },
   },
   plugins: [],
 }
+

@@ -9,6 +9,7 @@ import Runbook from './components/run-book/RunBook.jsx'
 import Kubernetes from './components/kubernetes/Kubernetes.jsx'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import ToastManager from './components/toast/ToastManager.jsx'
 import { WebSocketProvider } from './context/ContextApi.jsx'
 
 
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <WebSocketProvider>
+      <ToastManager />
     <RouterProvider router={router}/>
     </WebSocketProvider>
   </React.StrictMode>,
