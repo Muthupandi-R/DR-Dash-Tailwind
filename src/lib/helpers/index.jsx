@@ -112,6 +112,7 @@ export const statusUpdate = (filteredData, setFilteredData, socketData) => {
       console.log(`Updating status for item with ID: ${item.id}`);
 
       const action = socketData?.data?.appEventTypeDetail?.action?.toLowerCase();
+      
       const updateState = action === "started" ? "running" : action;
 
       return {
