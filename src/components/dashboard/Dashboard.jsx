@@ -107,7 +107,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="w-full bg-slate-100">
+    <div className="w-full bg-slate-100 mt-16">
       <div className="flex flex-col gap-4 mt-3">
       <div className="flex flex-row gap-x-8 w-full justify-end">
         {pieDatas.map((data, idx) => (
