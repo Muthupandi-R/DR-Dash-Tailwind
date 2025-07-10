@@ -3,18 +3,22 @@ import { FaBell, FaUserCircle } from 'react-icons/fa'
 
 const Navbar = ({ expanded }) => {
   return (
-    <nav className={`fixed top-0 z-40 bg-primary-800 px-4 py-3 flex justify-between h-16 transition-all duration-300 ${expanded ? "left-64" : "left-20"} right-0`}>
+    <nav className={`fixed top-0 z-40 bg-gradient-to-l from-primary-900 via-primary-800 to-primary-700 px-4 py-3 flex justify-between h-12 transition-all duration-300 ${expanded ? "left-64" : "left-20"} right-0`}>
       <div className="flex items-center text-xl">
-        <span className="text-white font-semibold">Disaster Recovery</span>
+        {!expanded && (
+          <span className="font-extrabold text-lg tracking-wide font-['Poppins',_sans-serif] bg-gradient-to-r from-primary-200 via-primary-100 to-cyan-200 bg-clip-text text-transparent drop-shadow-md">
+            Disaster Recovery
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-x-5">
         
-        <div className='text-white'><FaBell className='w-6 h-6'></FaBell></div>
+        <div className='text-primary-100'><FaBell className='w-6 h-6'></FaBell></div>
         <div className='relative'>
-            <button className='text-white'>
+            <button className='text-primary-100'>
                 <FaUserCircle className='w-6 h-6 mt-1' />
-                <div className='z-10 hidden absolute rounded-lg shadow w-32'>
+                <div className='z-10 hidden absolute rounded-lg shadow w-32 bg-primary-900 text-primary-100'>
                     <ul>
                         <li><a href="">Profile</a></li>
                         <li><a href="">Settings</a></li>

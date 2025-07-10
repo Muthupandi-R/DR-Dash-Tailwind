@@ -125,7 +125,7 @@ export default function Login() {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-blue-900 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-primary-800 relative overflow-hidden">
       {/* Earth GIF background, left side */}
       <img
         src={earthGif}
@@ -136,8 +136,8 @@ export default function Login() {
       {/* Animated background elements */}
       <div className="absolute inset-0">
         {/* Gradient orbs */}
-        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-blob1"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl animate-blob2"></div>
+        <div className="absolute top-20 left-20 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-blob1"></div>
+        <div className="absolute top-40 right-20 w-96 h-96 bg-primary-300/20 rounded-full blur-3xl animate-blob2"></div>
         <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl animate-blob3"></div>
         
         {/* Floating resource icons */}
@@ -162,7 +162,7 @@ export default function Login() {
             Disaster Recovery
           </span>
         </h1>
-        <p className="text-xl md:text-2xl bg-gradient-to-r from-blue-200 via-cyan-200 to-purple-200 bg-clip-text text-transparent drop-shadow-lg mb-12 text-center animate-fade-in">
+        <p className="text-xl md:text-2xl bg-gradient-to-r from-primary-200 via-cyan-200 to-purple-200 bg-clip-text text-transparent drop-shadow-lg mb-12 text-center animate-fade-in">
           Select your cloud provider to continue
         </p>
         
