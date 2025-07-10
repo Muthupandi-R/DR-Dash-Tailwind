@@ -50,9 +50,10 @@ export function getOrderStatus(status) {
 
 export async function fetchDataDashboard() {
   try {
+    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure'; // default to azure
     let apiUrl = `${
       import.meta.env.VITE_API_BASE_URL
-    }/cloud/azure/resources?top=20`;
+    }/cloud/${selectedCloud}/resources?top=20`;
     const response = await axios.get(apiUrl);
     console.log(response.data.data.data, "Data");
     return response?.data?.data?.data;
@@ -64,9 +65,11 @@ export async function fetchDataDashboard() {
 
 export async function fetchResourceStats() {
   try {
+    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure'; // default to azure
+
     let apiUrl = `${
       import.meta.env.VITE_API_BASE_URL
-    }/cloud/gcp/resources-stats`;
+    }/cloud/${selectedCloud}/resources-stats`;
     const response = await axios.get(apiUrl);
     return response?.data?.data?.[0];
   } catch (error) {

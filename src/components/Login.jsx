@@ -109,6 +109,11 @@ function FloatingIcon({ icon, name, delay, position }) {
 export default function Login() {
   const navigate = useNavigate();
 
+  const handleCloudClick = (provider) => {
+    localStorage.setItem('selectedCloud', provider); // e.g., 'aws', 'azure', 'gcp'
+    navigate("/dashboard");
+  };
+
   // Generate positions for floating icons with better spacing between them
   const floatingPositions = [
     { x: 15, y: 25 },   // Top left
@@ -166,7 +171,7 @@ export default function Login() {
             <CloudCard
               key={cloud.name}
               cloud={cloud}
-              onClick={() => navigate("/dashboard")}
+              onClick={() => handleCloudClick(cloud.name.toLowerCase())}
             />
           ))}
         </div>
