@@ -62,6 +62,19 @@ export async function fetchDataDashboard() {
   }
 }
 
+export async function fetchResourceStats() {
+  try {
+    let apiUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/cloud/gcp/resources-stats`;
+    const response = await axios.get(apiUrl);
+    return response?.data?.data?.[0];
+  } catch (error) {
+    console.error("Failed to fetch resource stats:", error);
+    throw error;
+  }
+}
+
 export const getResourceTypeLabel = (type, kind) => {
   const typeMap = {
     "microsoft.compute/virtualmachines": "VirtualMachine",

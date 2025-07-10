@@ -7,6 +7,7 @@ import CapacityPlan from './components/capacity-planning/CapacityPlan.jsx'
 import Msteams from './components/teams/Msteams.jsx'
 import Runbook from './components/run-book/RunBook.jsx'
 import Kubernetes from './components/kubernetes/Kubernetes.jsx'
+import Login from './components/Login.jsx'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import ToastManager from './components/toast/ToastManager.jsx'
@@ -14,7 +15,8 @@ import { WebSocketProvider } from './context/ContextApi.jsx'
 
 
 const router = createBrowserRouter([
-  {path: "/" , element: <App><Dashboard /></App>},
+  {path: "/" , element: <Login />},
+  {path: "/dashboard" , element: <App><Dashboard /></App>},
   {path: "/initiatedr" , element: <App><InitiateDr /></App>},
   {path: "/capacity-plan" , element: <App><CapacityPlan /></App>},
   {path: "/teams" , element: <App><Msteams /></App>},
