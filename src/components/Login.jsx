@@ -7,7 +7,10 @@ import azureFunctionAppIcon from "../assets/azure-function-app.png";
 import azureAksIcon from "../assets/azure-aks.png";
 import awsLambdaIcon from "../assets/aws-lambda.png";
 import gcpSqlIcon from "../assets/gcp-sql.png";
-import './dashboard/AnimatedLogin.css';
+import awsEc2Icon from "../assets/aws-ec2.png";
+import gcpComputeEngineIcon from "../assets/gcp-compute-engine.png";
+import './AnimatedLogin.css';
+import earthGif from '../assets/earth-rotate.gif'; // adjust path if needed
 
 const clouds = [
   {
@@ -35,12 +38,12 @@ const clouds = [
 
 // Resource icons for floating animation
 const resourceIcons = [
-  { icon: azureFunctionAppIcon, name: "Azure Function", delay: 0 },
-  { icon: azureAksIcon, name: "AKS", delay: 2 },
-  { icon: awsLambdaIcon, name: "Lambda", delay: 4 },
+  { icon: gcpComputeEngineIcon, name: "Gcp VM", delay: 0 },
+  { icon: awsLambdaIcon, name: "Aws Lambda", delay: 4 },
+  { icon: azureAksIcon, name: "Azure AKS", delay: 2 },
   { icon: gcpSqlIcon, name: "GCP SQL", delay: 6 },
-  { icon: azureFunctionAppIcon, name: "Azure VM", delay: 8 },
-  { icon: awsLambdaIcon, name: "EC2", delay: 10 },
+  { icon: azureFunctionAppIcon, name: "Azure Function", delay: 8 },
+  { icon: awsEc2Icon, name: "Aws EC2", delay: 10 },
 ];
 
 function CloudCard({ cloud, onClick }) {
@@ -65,17 +68,16 @@ function CloudCard({ cloud, onClick }) {
       onClick={onClick}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`group relative flex flex-col items-center justify-center w-64 h-64 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm`}
+      className={`group relative flex flex-col items-center justify-center w-55 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm`}
       style={{ 
-        boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)",
-        background: `${cloud.bg} linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)`
+        boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)"
       }}
     >
-      <div className="flex items-center justify-center w-28 h-28 bg-white/90 rounded-full mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-        <img src={cloud.logo} alt={cloud.name + " logo"} className="w-20 h-20 object-contain" />
+      <div className="flex items-center justify-center w-20 h-20 bg-white/90 rounded-full mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+        <img src={cloud.logo} alt={cloud.name + " logo"} className="w-14 h-14 object-contain" />
       </div>
-      <span className="text-3xl font-bold text-white drop-shadow-lg tracking-wide">{cloud.name}</span>
-      <span className="absolute bottom-6 left-1/2 -translate-x-1/2 text-sm text-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <span className="text-2xl font-bold text-white drop-shadow-lg tracking-wide">{cloud.name}</span>
+      <span className="w-20 absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         Click to enter {cloud.name} dashboard
       </span>
       <span className="shine absolute inset-0 pointer-events-none" />
@@ -118,7 +120,14 @@ export default function Login() {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-blue-900 relative overflow-hidden">
+      {/* Earth GIF background, left side */}
+      <img
+        src={earthGif}
+        alt="Earth"
+        className="absolute left-0 bottom-0 w-1/3 max-w-xs opacity-80 pointer-events-none select-none"
+        style={{ zIndex: 1 }}
+      />
       {/* Animated background elements */}
       <div className="absolute inset-0">
         {/* Gradient orbs */}
@@ -140,10 +149,15 @@ export default function Login() {
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-8">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-white drop-shadow-2xl mb-4 text-center animate-portal-glow">
-          Cloud Dashboard
+        <h1 className="relative text-5xl md:text-6xl font-extrabold mb-4 text-center overflow-hidden">
+          <span
+            className="inline-block bg-[linear-gradient(110deg,#a5f3fc,60%,#fff,80%,#c4b5fd)] bg-[length:200%_100%] bg-clip-text text-transparent animate-shine"
+            style={{ WebkitBackgroundClip: 'text', backgroundClip: 'text' }}
+          >
+            Disaster Recovery
+          </span>
         </h1>
-        <p className="text-xl md:text-2xl text-blue-100 drop-shadow-lg mb-12 text-center animate-portal-glow">
+        <p className="text-xl md:text-2xl bg-gradient-to-r from-blue-200 via-cyan-200 to-purple-200 bg-clip-text text-transparent drop-shadow-lg mb-12 text-center animate-fade-in">
           Select your cloud provider to continue
         </p>
         

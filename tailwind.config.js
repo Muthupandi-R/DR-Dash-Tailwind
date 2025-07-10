@@ -21,14 +21,19 @@ export default {
           800: colors.indigo[800],
         },
       },
-       keyframes: {
+      keyframes: {
         slideIn: {
           "0%": { opacity: 0, transform: "translateX(100%)" },
           "100%": { opacity: 1, transform: "translateX(0)" },
         },
+        shine: {
+          '0%': { 'background-position': '-200% 0' },
+          '100%': { 'background-position': '200% 0' },
+        },
       },
       animation: {
         slideIn: "slideIn 0.4s ease-out",
+        shine: "shine 1.5s linear infinite",
       },
     },
   },
