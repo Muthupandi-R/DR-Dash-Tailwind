@@ -6,18 +6,18 @@ import { FiBookOpen } from "react-icons/fi";
 import Sidebar, { SidebarItem } from "./Sidebar";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function SidebarLayout() {
+export default function SidebarLayout({ expanded, setExpanded}) {
   const location = useLocation();
   const navigate = useNavigate();
 
   const currentPath = location.pathname;
   return (
-    <Sidebar>
+    <Sidebar expanded={expanded} setExpanded={setExpanded}>
       <SidebarItem
         icon={<SlSpeedometer size={20} />}
         text="Dashboard"
-        onClick={() => navigate("/")}
-        active={currentPath === "/"}
+        onClick={() => navigate("/dashboard")}
+        active={currentPath === "/dashboard"}
       />
       <SidebarItem
         icon={<SlEnergy size={20} />}

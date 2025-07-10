@@ -1,16 +1,13 @@
-import { ChevronFirst, ChevronLast, MoreVertical } from "lucide-react"
+import { ChevronFirst, ChevronLast } from "lucide-react"
 import logo from "../assets/logo.png"
-import profile from "../assets/profile.png"
-// import logo from "../assets/disaster-logo.png"
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext } from "react"
 
 const SidebarContext = createContext();
 
-export default function Sidebar({ children }) {
-    const [expanded, setExpanded] = useState(true)
+export default function Sidebar({ expanded, setExpanded, children }) {
     return (
         <>
-            <aside className="h-screen">
+            <aside className={`fixed top-0 left-0 h-screen z-50 transition-all duration-300 ${expanded ? "w-64" : "w-20"}`}>
                 <nav className="h-full flex flex-col bg-white border-r shadow-sm">
                     <div className="p-4 pb-2 flex justify-between items-center">
                         <img src={logo} className={`overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`} />
@@ -18,12 +15,9 @@ export default function Sidebar({ children }) {
                             {expanded ? <ChevronFirst /> : <ChevronLast />}
                         </button>
                     </div>
-
                     <SidebarContext.Provider value={{ expanded }}>
-
                         <ul className="flex-1 px-3">{children}</ul>
                     </SidebarContext.Provider>
-
                 </nav>
             </aside>
         </>

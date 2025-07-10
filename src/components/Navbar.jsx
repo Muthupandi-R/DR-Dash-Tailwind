@@ -1,9 +1,9 @@
 import React from 'react'
 import { FaBell, FaUserCircle } from 'react-icons/fa'
 
-const Navbar = () => {
+const Navbar = ({ expanded }) => {
   return (
-    <nav className="bg-primary-800 px-4 py-3 flex justify-between">
+    <nav className={`fixed top-0 z-40 bg-primary-800 px-4 py-3 flex justify-between h-16 transition-all duration-300 ${expanded ? "left-64" : "left-20"} right-0`}>
       <div className="flex items-center text-xl">
         <span className="text-white font-semibold">Disaster Recovery</span>
       </div>
