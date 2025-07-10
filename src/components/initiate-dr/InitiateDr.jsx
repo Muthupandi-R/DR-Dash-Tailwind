@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TableComponent from "./TableComponent";
+import TableData from "./TableData";
 import project1 from "../../images/project.png";
 
 const MAX_TABS = 5;
@@ -10,12 +10,9 @@ const InitiateDr = () => {
 
   const handleAddTab = () => {
     if (tabs.length >= MAX_TABS) return;
-
     const newTabId = `tab-${tabs.length + 1}`;
     const newTabName = `Project ${tabs.length + 1}`;
-
     const newTab = { id: newTabId, name: newTabName };
-
     setTabs([...tabs, newTab]);
     setActiveTab(newTabId);
   };
@@ -42,7 +39,9 @@ const InitiateDr = () => {
         {tabs.map((tab) => (
           <div
             key={tab.id}
-            className={`relative flex items-center cursor-pointer px-8 py-2 rounded-t-md transition-all duration-200 min-w-[180px] max-w-xs ${
+            className={`relative flex items-center cursor-pointer 
+            px-8 py-2 rounded-t-md transition-all duration-200 
+            min-w-[180px] max-w-xs ${
               activeTab === tab.id
                 ? "bg-white border border-b-0 font-semibold"
                 : "bg-gray-200 hover:bg-gray-300"
@@ -78,7 +77,7 @@ const InitiateDr = () => {
         {tabs.length < MAX_TABS && (
           <button
             onClick={handleAddTab}
-            className="ml-auto flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-700 text-white text-2xl font-bold shadow hover:scale-105 transition-transform duration-200 focus:outline-none"
+            className="ml-auto flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-sky-200 via-emerald-100 to-blue-100 text-sky-700 text-2xl font-bold shadow hover:scale-110 transition-transform duration-200 focus:outline-none border border-sky-200"
             title="Add new tab"
           >
             +
@@ -89,7 +88,7 @@ const InitiateDr = () => {
       {/* Component Area */}
       {activeTab && (
         <div className="bg-white p-6 rounded shadow-md">
-          <TableComponent />
+          <TableData />
         </div>
       )}
     </div>
