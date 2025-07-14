@@ -1,8 +1,16 @@
 import axios from "axios";
+import { useContext } from "react";
+import ContextApi from "../../context/ContextApi";
+
 
 export function getOrderStatus(status) {
   const statusMap = {
     RUNNING: {
+      textColor: "text-green-600",
+      bgColor: "bg-green-100",
+      dotColor: "#14804A",
+    },
+    RUNNABLE: {
       textColor: "text-green-600",
       bgColor: "bg-green-100",
       dotColor: "#14804A",
@@ -48,9 +56,11 @@ export function getOrderStatus(status) {
   );
 }
 
-export async function fetchDataDashboard() {
+export async function fetchDataDashboard(selectedCloud) {
   try {
-    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure'; // default to azure
+    // const selconst { selectedCloud } = useContext(ContextApi);
+
+    console.log(selectedCloud, "selectedCloud");
     let apiUrl = `${
       import.meta.env.VITE_API_BASE_URL
     }/cloud/${selectedCloud}/resources?top=20`;
@@ -63,10 +73,8 @@ export async function fetchDataDashboard() {
   }
 }
 
-export async function fetchResourceStats() {
+export async function fetchResourceStats(selectedCloud) {
   try {
-    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure'; // default to azure
-
     let apiUrl = `${
       import.meta.env.VITE_API_BASE_URL
     }/cloud/${selectedCloud}/resources-stats`;

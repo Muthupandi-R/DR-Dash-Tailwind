@@ -21,12 +21,13 @@ export default function DashTable() {
   const [sortOrder, setSortOrder] = useState(null); // 'asc' | 'desc' | null
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const { socketData } = useContext(ContextApi);
+  const { selectedCloud } = useContext(ContextApi);
 
   useEffect(() => {
     const fetchData = async () => {
       setTableLoading(true);
       try {
-        const data = await fetchDataDashboard();
+        const data = await fetchDataDashboard(selectedCloud);
         const updatedData = data?.map((item) => ({
           ...item,
           state:
@@ -89,7 +90,7 @@ export default function DashTable() {
   };
 
   return (
-    <div className="bg-white px-4 pt-3 pb-4 rounded-sm border border-gray-200 flex-1">
+    <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1">
       <div className="mt-2 flex justify-between items-center">
         <TableTabs />
         <SearchBar />
@@ -101,7 +102,7 @@ export default function DashTable() {
           <>
             <div className="max-h-[50vh] overflow-y-auto scrollbar-thin overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-primary-200">
                   <tr>
                     <th className="p-3">
                       <div className="inline-flex items-center">
@@ -149,7 +150,7 @@ export default function DashTable() {
                     </th>
                     <th
                       scope="col"
-                      className="relative p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="relative p-3 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       <div className="flex items-center gap-1">
                         Resource Name
@@ -186,43 +187,43 @@ export default function DashTable() {
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-3 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Status
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-3 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Type
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-3 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Resource Group
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-3 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Resource Tag
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-3 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Project Name
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-3 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Location
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-primary-50 divide-y divide-gray-200">
                   {filteredData.map((data) => (
                     <tr
                       key={data.id}

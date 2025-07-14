@@ -2,9 +2,10 @@ import React, { createContext, useState, useEffect, useRef } from 'react';
 
 const ContextApi = createContext();
 
-export const WebSocketProvider = ({ children }) => {
+export const ContextProvider = ({ children }) => {
   const [socketData, setSocketData] = useState(null);
   const socketRef = useRef(null);
+  const [selectedCloud, setSelectedCloud] = useState(localStorage.getItem('selectedCloud') || 'azure');
 
   const connectWebSocket = () => {
     const wsUrl = "wss://drdashboard.4blabs.com/azure"
@@ -54,8 +55,13 @@ export const WebSocketProvider = ({ children }) => {
     setSocketData(null);
   };
 
+  const handleCloudChange = (provider) => {
+      localStorage.setItem('selectedCloud', provider);
+      setSelectedCloud(provider);
+  };
+  
   return (
-    <ContextApi.Provider value={{ socketData, clearSocketData }}>
+    <ContextApi.Provider value={{ socketData, clearSocketData , selectedCloud, handleCloudChange }}>
       {children}
     </ContextApi.Provider>
   );
