@@ -58,14 +58,14 @@ export function SidebarItem({ icon, text, active, alert, onClick }) {
     return (
         <li
   onClick={onClick}
-  className={`relative flex items-center h-12 py-2 px-4 my-1 font-semibold rounded-md cursor-pointer transition-all duration-200 group
+  className={`relative flex items-center h-10 py-2 px-4 my-1 font-semibold rounded-md cursor-pointer transition-all duration-200 group
     ${active
       ? "bg-primary-800 border-l-4 border-primary-400 shadow-md scale-105 text-primary-50"
       : "hover:bg-primary-700/60 hover:border-l-4 hover:border-primary-300 hover:scale-105 text-primary-200"}
   `}
 >
   {icon}
-  <span className={`overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}>
+  <span className={`overflow-hidden transition-all ${expanded ? "text-sm w-52 ml-3" : "w-0"}`}>
     {text}
   </span>
   {alert && (

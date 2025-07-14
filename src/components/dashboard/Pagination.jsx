@@ -29,7 +29,7 @@ function Pagination() {
         {/* Next Button */}
         <a
           href="#"
-          className="flex items-center justify-center px-4 h-9 me-3 text-sm font-medium text-primary bg-white border border-primary rounded-lg shadow-sm hover:bg-primary hover:text-white hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-300 transition"
+          className="flex items-center justify-center px-4 h-9 me-3 text-sm font-medium  no-underline text-primary bg-white border border-primary rounded-lg shadow-sm hover:bg-primary hover:text-white hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-300 transition"
         >
           Next
           <svg

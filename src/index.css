@@ -13,7 +13,7 @@
 	}
 	th,
 	td {
-		@apply py-3 px-2.5 text-sm text-left border-y border-gray-200;
+		@apply py-2 px-2.5 text-sm text-left border-y border-primary-300;
 	}
 	thead {
 		@apply bg-neutral-100;
@@ -22,7 +22,7 @@
 		@apply font-semibold;
 	}
 	a {
-		@apply text-sky-500 hover:underline;
+		@apply text-sky-500 ;
 	}
 }
 .apexcharts-legend-marker {

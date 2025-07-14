@@ -3,48 +3,68 @@ import TabItem from "./TabItem";
 
 const facets = [
   {
-    expression: "location",
-    data: [
-      { location: "eastus", count: 4 },
-      { location: "southindia", count: 1 },
-    ],
+      "expression": "location",
+      "totalRecords": 3,
+      "count": 3,
+      "resultType": "FacetResult",
+      "data": [
+          {
+              "location": "asia-south1",
+              "count": 1
+          },
+          {
+              "location": "us-east1",
+              "count": 5
+          },
+          {
+              "location": "us-central1",
+              "count": 1
+          }
+      ]
   },
   {
-    expression: "type",
-    data: [
-      { type: "microsoft.web/sites", count: 2 },
-      { type: "microsoft.compute/virtualmachines", count: 1 },
-      { type: "microsoft.containerservice/managedclusters", count: 1 },
-      { type: "microsoft.sql/servers", count: 1 },
-    ],
+      "expression": "type",
+      "totalRecords": 2,
+      "count": 2,
+      "resultType": "FacetResult",
+      "data": [
+          {
+              "type": "computeEngine",
+              "count": 1
+          },
+          {
+              "type": "sql",
+              "count": 6
+          }
+      ]
   },
   {
-    expression: "state",
-    data: [
-      { state: "Stopped", count: 2 },
-      { state: "PowerState/deallocated", count: 1 },
-      { state: "Ready", count: 1 },
-      { state: "Running", count: 1 },
-    ],
-  },
-  {
-    expression: "projectName",
-    data: [
-      { projectName: "az-fb-rg-drd", count: 4 },
-      { projectName: "ats-rg", count: 1 },
-    ],
-  },
+      "expression": "projectName",
+      "totalRecords": 2,
+      "count": 2,
+      "resultType": "FacetResult",
+      "data": [
+          {
+              "projectName": "My First Project",
+              "count": 2
+          },
+          {
+              "projectName": "DRD-Project",
+              "count": 5
+          }
+      ]
+  }
 ];
 
 const TableTabs = () => {
   const [activeTab, setActiveTab] = useState("location");
 
   return (
-    <div className="flex flex-row items-center gap-5 px-5">
+    <div className="flex flex-row items-center gap-5 px-5 text-xs">
       {facets.map((facet, index) => (
         <TabItem
           key={index}
-          expression={facet.expression}
+          expression={facet.expression.toUpperCase()}
           data={facet.data}
           activeTab={activeTab}
           setActiveTab={setActiveTab}

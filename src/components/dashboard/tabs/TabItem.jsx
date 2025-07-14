@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FaChevronDown, FaFilter } from "react-icons/fa";
 
 const TabItem = ({ expression, data, activeTab, setActiveTab }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [filterInput, setFilterInput] = useState(""); // used for searching
   const [selectedItems, setSelectedItems] = useState([]);
+  const dropdownRef = useRef(null);
 
   const isActive = activeTab === expression;
 
@@ -34,14 +35,31 @@ const TabItem = ({ expression, data, activeTab, setActiveTab }) => {
     );
   };
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    function handleClickOutside(event) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   return (
-    <div>
+    <div ref={dropdownRef}>
       <div
         className={`flex items-center gap-2 border-b-2 pb-1 cursor-pointer
         ${
           isActive
             ? "border-primary hover:border-primary"
-            : "border-transparent hover:border-black"
+            : "border-transparent hover:border-primary"
         }`}
         onClick={handleTabClick}
       >
@@ -49,16 +67,17 @@ const TabItem = ({ expression, data, activeTab, setActiveTab }) => {
           className={`font-normal ${
             isActive ||
             filteredOptions.some((opt) => selectedItems.includes(opt.label))
-              ? "text-primary font-bold"
-              : ""
+              ? "text-primary-900 font-semibold"
+              : "text-primary-800 font-bold"
           }`}
         >
           {expression}
+          
         </h3>
 
         <span
           className={`bg-gray-200 rounded-xl text-xs px-2 font-light
-          ${isActive ? "bg-primary text-white" : ""}`}
+          ${isActive ? "bg-primary text-white" : "bg-primary-100 text-primary-900"}`}
         >
           {data.length}
         </span>
@@ -68,6 +87,9 @@ const TabItem = ({ expression, data, activeTab, setActiveTab }) => {
             isDropdownOpen ? "rotate-180" : ""
           }`}
         />
+            {selectedItems.length > 0 && (
+            <span className="relative bottom-1 right-0 w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          )}
       </div>
 
       {isActive && isDropdownOpen && (
