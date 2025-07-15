@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaChevronDown, FaFilter } from "react-icons/fa";
 
-const TabItem = ({ expression, data, activeTab, setActiveTab }) => {
+const TabItem = ({ expression, data, activeTab, setActiveTab, selectedFilters, setSelectedFilters }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [filterInput, setFilterInput] = useState(""); // used for searching
   const [selectedItems, setSelectedItems] = useState([]);
+
   const dropdownRef = useRef(null);
 
   const isActive = activeTab === expression;
@@ -30,10 +31,32 @@ const TabItem = ({ expression, data, activeTab, setActiveTab }) => {
   );
 
   const handleSelect = (label) => {
-    setSelectedItems((prev) =>
-      prev.includes(label) ? prev.filter((v) => v !== label) : [...prev, label]
-    );
+    let updatedSelectedItems = selectedItems.includes(label)
+      ? selectedItems.filter((v) => v !== label)
+      : [...selectedItems, label];
+  
+    setSelectedItems(updatedSelectedItems);
+  
+    const joinedValue = updatedSelectedItems.join(",");
+    console.log(joinedValue, "joinedValue");
+  
+    // Update filter in parent
+    setSelectedFilters((prev) => {
+      const updatedFilters = { ...prev };
+      const key = expression.toLowerCase();
+  
+      if (updatedSelectedItems.length === 0) {
+        delete updatedFilters[key]; // ✅ remove key when no filters selected
+      } else {
+        updatedFilters[key] = joinedValue; // ✅ use string, not array
+      }
+  
+      console.log(updatedFilters, "updatedFilters");
+      return updatedFilters;
+    });
   };
+  
+  
 
   // Close dropdown on outside click
   useEffect(() => {

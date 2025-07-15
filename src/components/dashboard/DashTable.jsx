@@ -22,22 +22,16 @@ export default function DashTable() {
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const { socketData } = useContext(ContextApi);
   const { selectedCloud } = useContext(ContextApi);
+  const [selectedFilters, setSelectedFilters] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       setTableLoading(true);
       try {
-        const data = await fetchDataDashboard(selectedCloud);
-        const updatedData = data?.map((item) => ({
-          ...item,
-          state:
-            item?.state === "PowerState/deallocated"
-              ? "Stopped"
-              : item?.state === "PowerState/running"
-              ? "Running"
-              : item?.state,
-        }));
-        setFilteredData(updatedData);
+        console.log(selectedFilters, "selectedFilters");
+        const filterString = encodeURIComponent(JSON.stringify(selectedFilters));
+        const data = await fetchDataDashboard(selectedCloud, filterString);
+        setFilteredData(data);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
       } finally {
@@ -46,7 +40,7 @@ export default function DashTable() {
     };
 
     fetchData();
-  }, []);
+  }, [selectedFilters]);
 
   useEffect(() => {
     statusUpdate(filteredData, setFilteredData, socketData);
@@ -88,6 +82,7 @@ export default function DashTable() {
     setFilteredData(sortedData);
     setSortMenuOpen(false);
   };
+  
   const ServiceIcon = ({ cloud, serviceType}) => {
     const iconSrc = getIcon(cloud, serviceType);
     return iconSrc ? (
@@ -96,10 +91,11 @@ export default function DashTable() {
       <div className="w-4 h-4 rounded bg-gray-200 animate-pulse" />
     );
   };
+
   return (
     <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1">
       <div className="mt-2 flex justify-between items-center">
-        <TableTabs />
+        <TableTabs facets={filteredData?.facets} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
         <SearchBar />
       </div>
       <div className="border border-gray-200 rounded-sm mt-1">
@@ -231,7 +227,7 @@ export default function DashTable() {
                   </tr>
                 </thead>
                 <tbody className="bg-primary-50 divide-y divide-gray-200">
-                  {filteredData.map((data) => (
+                  {filteredData?.data?.map((data) => (
                     <tr
                       key={data.id}
                       className="hover:bg-gray-50 transition-colors duration-150"
