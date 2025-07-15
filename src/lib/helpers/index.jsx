@@ -152,3 +152,44 @@ export const statusUpdate = (filteredData, setFilteredData, socketData) => {
 
   setFilteredData(updatedFiltered);
 };
+
+export async function fetchProjects() {
+  try {
+    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure'; // default to azure
+
+    let apiUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/cloud/${selectedCloud}/project-name-list`;
+    const response = await axios.get(apiUrl);
+    return response?.data?.data?.data;
+  } catch (error) {
+    console.error("Failed to fetch Projects:", error);
+    throw error;
+  }
+}
+
+export async function fetchInitiateDrResources(projectName) {
+  try {
+    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure';
+    let apiUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/cloud/${selectedCloud}/initiate-dr/resources?projectName=${projectName}`;
+    const response = await axios.get(apiUrl);
+    return response?.data?.data?.["active-nothing-resources"] || [];
+   
+    
+  } catch (error) {
+    console.error("Failed to fetch Initiate DR Resources:", error);
+    throw error;
+  }
+}
+
+export function getDrSuffix(cloud) {
+  const suffixMap = {
+    'azure': '-rg-cus-dr',
+    'aws': '-drd',
+    'gcp': '-drdd'
+  };
+  return suffixMap[cloud] || '-rg-cus-dr';
+}
+

@@ -4,7 +4,7 @@ import DEFAULT_IMG from '../../assets/azure-function-app.png'
 
 const getInitial = (name) => name && name.length > 0 ? name[0].toUpperCase() : '?';
 
-const TableComponent = ({ data = [], borderColor, thColor }) => {
+const TableComponent = ({ data = [], borderColor, thColor, showCheckbox = true }) => {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   return (
     <div className={`overflow-x-auto rounded-lg shadow-md bg-white border ${borderColor}`}>
@@ -12,7 +12,11 @@ const TableComponent = ({ data = [], borderColor, thColor }) => {
         <thead>
           <tr className={thColor}>
             <th className="p-3 border-b text-left font-semibold">
-              <input type="checkbox" disabled className="accent-primary-500" />
+              {showCheckbox ? (
+                <input type="checkbox" disabled className="accent-primary-500" />
+              ) : (
+                <div className="w-4 h-4"></div>
+              )}
             </th>
             <th className="p-3 border-b text-left font-semibold">Resource Name</th>
             <th className="p-3 border-b text-left font-semibold">Location</th>
@@ -35,10 +39,14 @@ const TableComponent = ({ data = [], borderColor, thColor }) => {
                   } hover:bg-primary-50 group`}
                 >
                   <td className="p-3 border-b align-middle">
-                    <input
-                      type="checkbox"
-                      className="accent-primary-500 focus:ring-2 focus:ring-primary-400 rounded border-gray-300"
-                    />
+                    {showCheckbox ? (
+                      <input
+                        type="checkbox"
+                        className="accent-primary-500 focus:ring-2 focus:ring-primary-400 rounded border-gray-300"
+                      />
+                    ) : (
+                      <div className="w-4 h-4"></div>
+                    )}
                   </td>
                   <td className="p-3 border-b align-middle font-medium text-gray-800 group-hover:text-indigo-700 flex items-center gap-2">
                     {/* Show initial if no image, else show image */}

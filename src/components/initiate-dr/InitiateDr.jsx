@@ -33,7 +33,7 @@ const InitiateDr = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-100 p-6 mt-16">
+    <div className="w-full min-h-screen bg-gradient-to-l from-primary-200 via-primary-300 to-primary-200 p-6 mt-12">
       {/* Top Tabs */}
       <div className="flex items-center space-x-2">
         {tabs.map((tab) => (
