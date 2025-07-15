@@ -12,7 +12,7 @@ import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
 import { RiExpandUpDownLine } from "react-icons/ri";
 import ContextApi from "../../context/ContextApi";
-
+import { getIcon } from "../../utils/iconMap";
 export default function DashTable() {
   const [filteredData, setFilteredData] = useState([]);
   const [tableLoading, setTableLoading] = useState(false);
@@ -21,22 +21,17 @@ export default function DashTable() {
   const [sortOrder, setSortOrder] = useState(null); // 'asc' | 'desc' | null
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const { socketData } = useContext(ContextApi);
+  const { selectedCloud } = useContext(ContextApi);
+  const [selectedFilters, setSelectedFilters] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       setTableLoading(true);
       try {
-        const data = await fetchDataDashboard();
-        const updatedData = data?.map((item) => ({
-          ...item,
-          state:
-            item?.state === "PowerState/deallocated"
-              ? "Stopped"
-              : item?.state === "PowerState/running"
-              ? "Running"
-              : item?.state,
-        }));
-        setFilteredData(updatedData);
+        console.log(selectedFilters, "selectedFilters");
+        const filterString = encodeURIComponent(JSON.stringify(selectedFilters));
+        const data = await fetchDataDashboard(selectedCloud, filterString);
+        setFilteredData(data);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
       } finally {
@@ -45,7 +40,7 @@ export default function DashTable() {
     };
 
     fetchData();
-  }, []);
+  }, [selectedFilters]);
 
   useEffect(() => {
     statusUpdate(filteredData, setFilteredData, socketData);
@@ -87,11 +82,20 @@ export default function DashTable() {
     setFilteredData(sortedData);
     setSortMenuOpen(false);
   };
+  
+  const ServiceIcon = ({ cloud, serviceType}) => {
+    const iconSrc = getIcon(cloud, serviceType);
+    return iconSrc ? (
+      <img src={iconSrc} alt={`${cloud}-${serviceType}`} className="w-4 h-4" />
+    ) : (
+      <div className="w-4 h-4 rounded bg-gray-200 animate-pulse" />
+    );
+  };
 
   return (
-    <div className="bg-white px-4 pt-3 pb-4 rounded-sm border border-gray-200 flex-1">
+    <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1">
       <div className="mt-2 flex justify-between items-center">
-        <TableTabs />
+        <TableTabs facets={filteredData?.facets} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
         <SearchBar />
       </div>
       <div className="border border-gray-200 rounded-sm mt-1">
@@ -101,15 +105,15 @@ export default function DashTable() {
           <>
             <div className="max-h-[50vh] overflow-y-auto scrollbar-thin overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-primary-200">
                   <tr>
-                    <th className="p-3">
+                    <th className="p-2">
                       <div className="inline-flex items-center">
                         <label className="flex items-center cursor-pointer relative">
                           <input
                             type="checkbox"
                             checked={isAllSelected}
-                            className={`peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary-500 checked:border-primary-500 ${
+                            className={`peer h-3 w-3 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary-500 checked:border-primary-500 ${
                               isIndeterminate && !isAllSelected
                                 ? "bg-primary-500 checked:border-primary-500"
                                 : ""
@@ -140,7 +144,7 @@ export default function DashTable() {
 
                           {/* Hyphen for "indeterminate" */}
                           {isIndeterminate && !isAllSelected && (
-                            <span className="absolute text-white text-sm font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <span className="absolute text-white text-xs font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                               &#8211; {/* this is the dash (–) */}
                             </span>
                           )}
@@ -149,7 +153,7 @@ export default function DashTable() {
                     </th>
                     <th
                       scope="col"
-                      className="relative p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="relative p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       <div className="flex items-center gap-1">
                         Resource Name
@@ -162,7 +166,7 @@ export default function DashTable() {
                       </div>
 
                       {sortMenuOpen && (
-                        <div className="absolute top-12 left-0 z-10 w-32 bg-white border rounded shadow-lg text-sm">
+                        <div className="absolute top-12 right-0 z-10 w-32 bg-white border rounded shadow-lg text-xs">
                           <button
                             className="w-full px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
                             onClick={() => applySort("name", "asc")}
@@ -186,49 +190,49 @@ export default function DashTable() {
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Status
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Type
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Resource Group
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Resource Tag
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Project Name
                     </th>
                     <th
                       scope="col"
-                      className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Location
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredData.map((data) => (
+                <tbody className="bg-primary-50 divide-y divide-gray-200">
+                  {filteredData?.data?.map((data) => (
                     <tr
                       key={data.id}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
-                      <td className="p-3">
+                      <td className="p-2">
                         {/* <input
                         type="checkbox"
                         checked={selectedIds.includes(data.id)}
@@ -239,7 +243,7 @@ export default function DashTable() {
                             <input
                               type="checkbox"
                               checked={selectedIds.includes(data.id)}
-                              className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary-500 checked:border-primary-500"
+                              className="peer h-3 w-3 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary-500 checked:border-primary-500"
                               onChange={(e) =>
                                 handleRowCheckboxChange(e, data.id)
                               }
@@ -263,27 +267,28 @@ export default function DashTable() {
                           </label>
                         </div>
                       </td>
-                      <td className="p-3 whitespace-nowrap text-sm text-gray-900">
-                        <h1 className="font-medium text-base text-primary-700 border-b border-transparent hover:border-primary-600 w-fit cursor-pointer">
-                          {data?.name}
-                        </h1>
+                      <td className="p-1 whitespace-nowrap text-xs text-gray-900">
+                        <div className="flex items-center gap-2">
+                          <ServiceIcon cloud={selectedCloud} serviceType={data?.type} />
+                          <span>{data?.name}</span>
+                        </div>
                       </td>
-                      <td className="p-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="p-1 whitespace-nowrap text-xs text-gray-900">
                         {getOrderStatus(data?.state)}
                       </td>
-                      <td className="p-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="p-1 whitespace-nowrap text-xs text-gray-900">
                         {getResourceTypeLabel(data?.type, data?.kind)}
                       </td>
-                      <td className="p-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="p-1 whitespace-nowrap text-xs text-gray-900">
                         {data?.projectName}
                       </td>
-                      <td className="p-3 text-sm text-gray-900">
+                      <td className="p-1 text-xs text-gray-900">
                         {data?.resourceTags?.Name || "-"}
                       </td>
-                      <td className="p-3 text-sm text-gray-900">
+                      <td className="p-1 text-xs text-gray-900">
                         {data?.projectTags?.Name}
                       </td>
-                      <td className="flex items-center gap-2 border-0 text-sm text-gray-800">
+                      <td className="flex items-center gap-2 border-0 text-xs text-gray-800">
                         <FiMapPin className="text-blue-600" />
                         {data?.location || "Unknown"}
                       </td>

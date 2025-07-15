@@ -1,8 +1,16 @@
 import axios from "axios";
+import { useContext } from "react";
+import ContextApi from "../../context/ContextApi";
+
 
 export function getOrderStatus(status) {
   const statusMap = {
     RUNNING: {
+      textColor: "text-green-600",
+      bgColor: "bg-green-100",
+      dotColor: "#14804A",
+    },
+    RUNNABLE: {
       textColor: "text-green-600",
       bgColor: "bg-green-100",
       dotColor: "#14804A",
@@ -48,25 +56,27 @@ export function getOrderStatus(status) {
   );
 }
 
-export async function fetchDataDashboard() {
+export async function fetchDataDashboard(selectedCloud,  filterString = "") {
   try {
-    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure'; // default to azure
-    let apiUrl = `${
-      import.meta.env.VITE_API_BASE_URL
-    }/cloud/${selectedCloud}/resources?top=20`;
+    // const selconst { selectedCloud } = useContext(ContextApi);
+
+    console.log(selectedCloud, "selectedCloud");
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    console.log(filterString, "filterString");
+    const apiUrl = `${baseUrl}/cloud/${selectedCloud}/resources?${
+      filterString ? `filters=${filterString}&` : ""
+    }top=20`;
     const response = await axios.get(apiUrl);
-    console.log(response.data.data.data, "Data");
-    return response?.data?.data?.data;
+    console.log(response.data.data, "Data");
+    return response?.data?.data;
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
     throw error; // optional: rethrow for higher-level handling
   }
 }
 
-export async function fetchResourceStats() {
+export async function fetchResourceStats(selectedCloud) {
   try {
-    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure'; // default to azure
-
     let apiUrl = `${
       import.meta.env.VITE_API_BASE_URL
     }/cloud/${selectedCloud}/resources-stats`;

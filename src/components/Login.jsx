@@ -11,106 +11,106 @@ import awsEc2Icon from "../assets/aws-ec2.png";
 import gcpComputeEngineIcon from "../assets/gcp-compute-engine.png";
 import './AnimatedLogin.css';
 import earthGif from '../assets/earth-rotate.gif'; // adjust path if needed
-
-const clouds = [
-  {
-    name: "AWS",
-    logo: awsLogo,
-    bg: "bg-gradient-to-tr from-yellow-400 to-yellow-600",
-    ring: "ring-yellow-400/60",
-    shadow: "shadow-yellow-300/40",
-  },
-  {
-    name: "Azure",
-    logo: azureLogo,
-    bg: "bg-gradient-to-tr from-blue-500 to-blue-800",
-    ring: "ring-blue-400/60",
-    shadow: "shadow-blue-400/40",
-  },
-  {
-    name: "GCP",
-    logo: gcpLogo,
-    bg: "bg-gradient-to-tr from-orange-400 to-red-500",
-    ring: "ring-orange-400/60",
-    shadow: "shadow-orange-300/40",
-  },
-];
-
-// Resource icons for floating animation
-const resourceIcons = [
-  { icon: gcpComputeEngineIcon, name: "Gcp VM", delay: 0 },
-  { icon: awsLambdaIcon, name: "Aws Lambda", delay: 4 },
-  { icon: azureAksIcon, name: "Azure AKS", delay: 2 },
-  { icon: gcpSqlIcon, name: "GCP SQL", delay: 6 },
-  { icon: azureFunctionAppIcon, name: "Azure Function", delay: 8 },
-  { icon: awsEc2Icon, name: "Aws EC2", delay: 10 },
-];
-
-function CloudCard({ cloud, onClick }) {
-  const cardRef = useRef(null);
-
-  const handleMouseMove = (e) => {
-    const card = cardRef.current;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    card.style.transform = `rotateY(${x / 12}deg) rotateX(${-y / 16}deg) scale(1.05)`;
-  };
-
-  const handleMouseLeave = () => {
-    const card = cardRef.current;
-    card.style.transform = "";
-  };
-
-  return (
-    <button
-      ref={cardRef}
-      onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={`group relative flex flex-col items-center justify-center w-55 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm`}
-      style={{ 
-        boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)"
-      }}
-    >
-      <div className="flex items-center justify-center w-20 h-20 bg-white/90 rounded-full mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-        <img src={cloud.logo} alt={cloud.name + " logo"} className="w-14 h-14 object-contain" />
-      </div>
-      <span className="text-2xl font-bold text-white drop-shadow-lg tracking-wide">{cloud.name}</span>
-      <span className="w-20 absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        Click to enter {cloud.name} dashboard
-      </span>
-      <span className="shine absolute inset-0 pointer-events-none" />
-    </button>
-  );
-}
-
-function FloatingIcon({ icon, name, delay, position }) {
-  return (
-    <div 
-      className={`absolute floating-icon opacity-60 hover:opacity-100 transition-opacity duration-300`}
-      style={{
-        left: position.x + '%',
-        top: position.y + '%',
-        animationDelay: delay + 's',
-        animationDuration: (15 + Math.random() * 10) + 's'
-      }}
-    >
-      <img 
-        src={icon} 
-        alt={name} 
-        className="w-12 h-12 object-contain drop-shadow-lg filter brightness-110"
-        title={name}
-      />
-    </div>
-  );
-}
-
+import { useContext } from "react";
+import ContextApi from "../context/ContextApi";
 export default function Login() {
+  const { handleCloudChange } = useContext(ContextApi);
+  const clouds = [
+    {
+      name: "AWS",
+      logo: awsLogo,
+      bg: "bg-gradient-to-tr from-yellow-400 to-yellow-600",
+      ring: "ring-yellow-400/60",
+      shadow: "shadow-yellow-300/40",
+    },
+    {
+      name: "Azure",
+      logo: azureLogo,
+      bg: "bg-gradient-to-tr from-blue-500 to-blue-800",
+      ring: "ring-blue-400/60",
+      shadow: "shadow-blue-400/40",
+    },
+    {
+      name: "GCP",
+      logo: gcpLogo,
+      bg: "bg-gradient-to-tr from-orange-400 to-red-500",
+      ring: "ring-orange-400/60",
+      shadow: "shadow-orange-300/40",
+    },
+  ];
+  
+  // Resource icons for floating animation
+  const resourceIcons = [
+    { icon: gcpComputeEngineIcon, name: "Gcp VM", delay: 0 },
+    { icon: awsLambdaIcon, name: "Aws Lambda", delay: 4 },
+    { icon: azureAksIcon, name: "Azure AKS", delay: 2 },
+    { icon: gcpSqlIcon, name: "GCP SQL", delay: 6 },
+    { icon: azureFunctionAppIcon, name: "Azure Function", delay: 8 },
+    { icon: awsEc2Icon, name: "Aws EC2", delay: 10 },
+  ];
+  
+  function CloudCard({ cloud, onClick }) {
+    const cardRef = useRef(null);
+  
+    const handleMouseMove = (e) => {
+      const card = cardRef.current;
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      card.style.transform = `rotateY(${x / 12}deg) rotateX(${-y / 16}deg) scale(1.05)`;
+    };
+  
+    const handleMouseLeave = () => {
+      const card = cardRef.current;
+      card.style.transform = "";
+    };
+  
+    return (
+      <button
+        ref={cardRef}
+        onClick={onClick}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className={`group relative flex flex-col items-center justify-center w-55 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm`}
+        style={{ 
+          boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)"
+        }}
+      >
+        <div className="flex items-center justify-center w-20 h-20 bg-white/90 rounded-full mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+          <img src={cloud.logo} alt={cloud.name + " logo"} className="w-14 h-14 object-contain" />
+        </div>
+        <span className="text-2xl font-bold text-white drop-shadow-lg tracking-wide">{cloud.name}</span>
+        <span className="w-20 absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          Click to enter {cloud.name} dashboard
+        </span>
+        <span className="shine absolute inset-0 pointer-events-none" />
+      </button>
+    );
+  }
+  
+  function FloatingIcon({ icon, name, delay, position }) {
+    return (
+      <div 
+        className={`absolute floating-icon opacity-60 hover:opacity-100 transition-opacity duration-300`}
+        style={{
+          left: position.x + '%',
+          top: position.y + '%',
+          animationDelay: delay + 's',
+          animationDuration: (15 + Math.random() * 10) + 's'
+        }}
+      >
+        <img 
+          src={icon} 
+          alt={name} 
+          className="w-12 h-12 object-contain drop-shadow-lg filter brightness-110"
+          title={name}
+        />
+      </div>
+    );
+  }
   const navigate = useNavigate();
-
   const handleCloudClick = (provider) => {
-    localStorage.setItem('selectedCloud', provider); // e.g., 'aws', 'azure', 'gcp'
+    handleCloudChange(provider);
     navigate("/dashboard");
   };
 

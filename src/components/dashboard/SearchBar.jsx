@@ -5,11 +5,11 @@ const SearchBar = () => {
     <div className="w-full max-w-sm min-w-[200px]">
   <div className="relative">
     <input
-      className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-3 pr-28 py-2 transition duration-300 ease focus:outline-none focus:border-primary-400 hover:border-primary-300 shadow-sm focus:shadow"
+    className="w-full bg-transparent placeholder:text-primary-500 text-primary-900 text-sm border border-primry-200 rounded-md pl-3 pr-28 py-2 transition duration-300 ease focus:outline-none border-primary-500 focus:border-primary-800 hover:border-primary-800 shadow-sm focus:shadow"
       placeholder="Search Resource Names and Projects.." 
     />
     <button
-      className="absolute top-1 right-1 flex items-center rounded bg-primary-800 py-1 px-2.5 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-primary-700 focus:shadow-none active:bg-primary-700 hover:bg-primary-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+      className="absolute top-1 right-1 flex items-center rounded bg-primary-700 py-1 px-2.5 border border-transparent text-center text-sm text-white transition-all hover:border-2 hover:border-primary-700 focus:bg-primary-700 focus:shadow-none active:bg-primary-700 hover:bg-primary-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
       type="button"
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 mr-2">

@@ -22,6 +22,15 @@ export default {
           800: colors.blue[800],
           900: colors.blue[900],
         },
+        gradientPrimary: {
+          DEFAULT: "bg-gradient-to-l from-primary-200 via-primary-300 to-primary-200",
+        },
+        gradientSecondary: {
+          DEFAULT: "bg-gradient-to-l from-primary-50 via-primary-800 to-primary-50",
+        },
+        gradientBg: {
+          DEFAULT: "bg-gradient-to-b from-[#7b2ff2] to-[#22c1c3]",
+        },
       },
       keyframes: {
         slideIn: {
