@@ -1,6 +1,4 @@
 import axios from "axios";
-import { useContext } from "react";
-import ContextApi from "../../context/ContextApi";
 
 
 export function getOrderStatus(status) {
@@ -30,6 +28,11 @@ export function getOrderStatus(status) {
       bgColor: "bg-green-100",
       dotColor: "#14804A",
     },
+    AVAILABLE: {
+      textColor: "text-green-600",
+      bgColor: "bg-green-100",
+      dotColor: "#14804A",
+    },
     READY: {
       textColor: "text-green-600",
       bgColor: "bg-green-100",
@@ -48,10 +51,10 @@ export function getOrderStatus(status) {
       className={`capitalize py-1 px-2 rounded-md text-xs inline-flex items-center gap-2 ${textColor} ${bgColor}`}
     >
       <span
-        className="w-2 h-2 rounded-[2px]"
+        className="w-2 h-2 rounded-[2px] text-xs"
         style={{ backgroundColor: dotColor }}
       ></span>
-      {status}
+      <span className="text-xs">{status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : ''}</span>
     </span>
   );
 }
@@ -153,10 +156,8 @@ export const statusUpdate = (filteredData, setFilteredData, socketData) => {
   setFilteredData(updatedFiltered);
 };
 
-export async function fetchProjects() {
+export async function fetchProjects(selectedCloud) {
   try {
-    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure'; // default to azure
-
     let apiUrl = `${
       import.meta.env.VITE_API_BASE_URL
     }/cloud/${selectedCloud}/project-name-list`;
@@ -168,9 +169,8 @@ export async function fetchProjects() {
   }
 }
 
-export async function fetchInitiateDrResources(projectName) {
+export async function fetchInitiateDrResources(projectName, selectedCloud) {
   try {
-    const selectedCloud = localStorage.getItem('selectedCloud') || 'azure';
     let apiUrl = `${
       import.meta.env.VITE_API_BASE_URL
     }/cloud/${selectedCloud}/initiate-dr/resources?projectName=${projectName}`;
@@ -187,7 +187,7 @@ export async function fetchInitiateDrResources(projectName) {
 export function getDrSuffix(cloud) {
   const suffixMap = {
     'azure': '-rg-cus-dr',
-    'aws': '-drd',
+    'aws': '-dr',
     'gcp': '-drdd'
   };
   return suffixMap[cloud] || '-rg-cus-dr';
