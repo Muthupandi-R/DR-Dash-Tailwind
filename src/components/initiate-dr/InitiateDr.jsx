@@ -56,7 +56,7 @@ const InitiateDr = () => {
               style={{ pointerEvents: 'none' }}
             />
 
-            <span>{tab.name}</span>
+            <span className="text-xs">{tab.name}</span>
             {/* Remove Icon - only show if more than one tab */}
             {tabs.length > 1 && (
               <button
@@ -77,20 +77,24 @@ const InitiateDr = () => {
         {tabs.length < MAX_TABS && (
           <button
             onClick={handleAddTab}
-            className="ml-auto flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-sky-200 via-emerald-100 to-blue-100 text-sky-700 text-2xl font-bold shadow hover:scale-110 transition-transform duration-200 focus:outline-none border border-sky-200"
+            className="ml-auto flex items-center gap-2 px-2 py-1 rounded-lg transition-all duration-200 focus:outline-none border-none group"
             title="Add new tab"
           >
-            +
+            <span className="text-2xl font-bold leading-none text-primary-500 group-hover:text-white group-hover:bg-primary-500 group-hover:rounded-md group-hover:px-2 group-hover:py-1 transition-all duration-200">
+              +
+            </span>
           </button>
         )}
       </div>
 
       {/* Component Area */}
-      {activeTab && (
-        <div className="bg-white p-6 rounded shadow-md">
-          <TableData />
-        </div>
-      )}
+      <div className="bg-white p-6 rounded shadow-md">
+        {tabs.map(tab => (
+          <div key={tab.id} style={{ display: activeTab === tab.id ? 'block' : 'none' }}>
+            <TableData key={tab.id} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

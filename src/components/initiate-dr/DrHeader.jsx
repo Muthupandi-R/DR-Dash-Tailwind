@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { fetchProjects } from '../../lib/helpers/index'
+import ContextApi from '../../context/ContextApi';
 
 // DrHeader component (select, stepper, Initiate DR button)
 const defaultProjectOption = { value: '', label: 'Select Project' };
@@ -11,13 +12,14 @@ const stepLabels = [
     'Verified',
 ];
 
-const DrHeader = ({ onProjectSelect }) => {
+const DrHeader = ({ onProjectSelect, onInitiateDr }) => {
     const [projectOptions, setProjectOptions] = useState([defaultProjectOption]);
     const [selected, setSelected] = useState(defaultProjectOption);
     const [search, setSearch] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const step = 2;
+    const { selectedCloud } = useContext(ContextApi);
 
     // Fetch projects only once on mount
     useEffect(() => {
@@ -25,7 +27,7 @@ const DrHeader = ({ onProjectSelect }) => {
         const loadProjects = async () => {
             try {
                 setLoading(true);
-                const response = await fetchProjects();
+                const response = await fetchProjects(selectedCloud);
                 if (isMounted && response) {
                     const options = response.map(project => ({
                         value: project.name,
@@ -60,7 +62,7 @@ const DrHeader = ({ onProjectSelect }) => {
                     onClick={() => setDropdownOpen((open) => !open)}
                     disabled={loading}
                 >
-                    <span>{loading ? 'Loading...' : selected.label}</span>
+                    <span className='text-xs'>{loading ? 'Loading...' : selected.label}</span>
                     <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {dropdownOpen && (
@@ -81,7 +83,7 @@ const DrHeader = ({ onProjectSelect }) => {
                                     {filteredOptions.map(opt => (
                                         <li
                                             key={opt.value}
-                                            className={`px-4 py-2 cursor-pointer hover:bg-primary-100 ${selected.value === opt.value ? 'bg-primary-50 font-semibold' : ''}`}
+                                            className={`px-4 py-2 cursor-pointer text-xs hover:bg-primary-100 ${selected.value === opt.value ? 'bg-primary-50 font-semibold' : ''}`}
                                             onClick={() => {
                                                 setSelected(opt);
                                                 setDropdownOpen(false);
@@ -150,8 +152,8 @@ const DrHeader = ({ onProjectSelect }) => {
             </div>
             {/* Initiate DR Button */}
             <button
-                className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2"
-                onClick={() => alert('Initiate DR!')}
+                className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-xs px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2"
+                onClick={() => onInitiateDr?.()}
             >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5" /></svg>
                 Initiate DR
