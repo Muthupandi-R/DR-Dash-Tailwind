@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TabItem from "./TabItem";
 
-const TableTabs = ({facets, selectedFilters, setSelectedFilters}) => {
+const TableTabs = ({facets, setSelectedFilters}) => {
   const [activeTab, setActiveTab] = useState("location");
 
   return (
@@ -13,7 +13,6 @@ const TableTabs = ({facets, selectedFilters, setSelectedFilters}) => {
           data={facet.data}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          selectedFilters={selectedFilters}
           setSelectedFilters={setSelectedFilters}
         />
       ))}

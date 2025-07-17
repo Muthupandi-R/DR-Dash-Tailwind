@@ -59,18 +59,27 @@ export function getOrderStatus(status) {
   );
 }
 
-export async function fetchDataDashboard(selectedCloud,  filterString = "") {
+export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, searchFilter = "") {
   try {
     // const selconst { selectedCloud } = useContext(ContextApi);
 
-    console.log(selectedCloud, "selectedCloud");
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    console.log(filterString, "filterString");
-    const apiUrl = `${baseUrl}/cloud/${selectedCloud}/resources?${
-      filterString ? `filters=${filterString}&` : ""
-    }top=20`;
+    let apiUrl = `${baseUrl}/cloud/${selectedCloud}/resources?`;
+    const queryParams = [];
+
+    if (Object.keys(selectedFilters).length > 0) {
+      const filterString = encodeURIComponent(JSON.stringify(selectedFilters));
+      queryParams.push(`filters=${filterString}`);
+    }
+
+    if (searchFilter.trim() !== "") {
+      queryParams.push(`searchFilter=${encodeURIComponent(searchFilter.trim())}`);
+    }
+
+    queryParams.push("top=20");
+
+    apiUrl += queryParams.join("&");
     const response = await axios.get(apiUrl);
-    console.log(response.data.data, "Data");
     return response?.data?.data;
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
@@ -132,7 +141,10 @@ const isFunctionApp = (kind) => {
 };
 
 export const statusUpdate = (filteredData, setFilteredData, socketData) => {
-  const updatedFiltered = filteredData.map((item) => {
+  console.log(filteredData, "filteredData");
+  
+  if(filteredData.length === 0) return;
+    const updatedFiltered = filteredData?.data?.map((item) => {
     const isMatchingId =
       item.id?.toLowerCase() === socketData?.topic?.toLowerCase();
     const isMatchingName = item.name === socketData?.data?.name;

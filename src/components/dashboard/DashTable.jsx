@@ -23,14 +23,13 @@ export default function DashTable() {
   const { socketData } = useContext(ContextApi);
   const { selectedCloud } = useContext(ContextApi);
   const [selectedFilters, setSelectedFilters] = useState({});
+  const [searchFilter, setSearchFilter] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       setTableLoading(true);
       try {
-        console.log(selectedFilters, "selectedFilters");
-        const filterString = encodeURIComponent(JSON.stringify(selectedFilters));
-        const data = await fetchDataDashboard(selectedCloud, filterString);
+        const data = await fetchDataDashboard(selectedCloud, selectedFilters, searchFilter);
         setFilteredData(data);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
@@ -40,11 +39,11 @@ export default function DashTable() {
     };
 
     fetchData();
-  }, [selectedFilters]);
+  }, [selectedFilters, searchFilter]);
 
   useEffect(() => {
     statusUpdate(filteredData, setFilteredData, socketData);
-  }, [socketData]);
+  }, [socketData]); 
 
   const isAllSelected =
     filteredData.length > 0 && selectedIds.length === filteredData.length;
@@ -54,7 +53,7 @@ export default function DashTable() {
   const handleSelectAllChange = (e) => {
     if (e.target.checked) {
       const allIds = filteredData.map((item) => item.id);
-      setSelectedIds(allIds);
+      setSelectedIds(allIds); 
     } else {
       setSelectedIds([]);
     }
@@ -71,17 +70,35 @@ export default function DashTable() {
   const applySort = (field, order) => {
     setSortField(order ? field : null);
     setSortOrder(order);
-
-    let sortedData = [...filteredData];
-    if (order === "asc") {
-      sortedData.sort((a, b) => a[field]?.localeCompare(b[field] || ""));
-    } else if (order === "desc") {
-      sortedData.sort((a, b) => b[field]?.localeCompare(a[field] || ""));
-    }
-
-    setFilteredData(sortedData);
+  
+    if (!filteredData?.data?.length) return;
+  
+    const sorted = [...filteredData.data].sort((a, b) => {
+      const aValue = a[field] || "";
+      const bValue = b[field] || "";
+  
+      if (order === "asc") return aValue.localeCompare(bValue);
+      if (order === "desc") return bValue.localeCompare(aValue);
+      return 0;
+    });
+  
+    // update the filteredData.data with sorted version
+    setFilteredData((prev) => ({
+      ...prev,
+      data: sorted,
+    }));
+  
     setSortMenuOpen(false);
+    if (!order) {
+      setSortField(null);
+      setSortOrder(null);
+    
+      // re-fetch unsorted data from backend
+      fetchDataDashboard(selectedCloud, selectedFilters, searchFilter).then(setFilteredData);
+      return;
+    }
   };
+  
   
   const ServiceIcon = ({ cloud, serviceType}) => {
     const iconSrc = getIcon(cloud, serviceType);
@@ -95,8 +112,8 @@ export default function DashTable() {
   return (
     <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1">
       <div className="mt-2 flex justify-between items-center">
-        <TableTabs facets={filteredData?.facets} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
-        <SearchBar />
+        <TableTabs facets={filteredData?.facets} setSelectedFilters={setSelectedFilters} />
+        <SearchBar setSearchFilter={setSearchFilter} />
       </div>
       <div className="border border-gray-200 rounded-sm mt-1">
         {tableLoading ? (
@@ -273,7 +290,7 @@ export default function DashTable() {
                           <span>{data?.name}</span>
                         </div>
                       </td>
-                      <td className="p-1 whitespace-nowrap text-xs text-gray-900">
+                      <td className="p-2 whitespace-nowrap text-xs text-gray-900">
                         {getOrderStatus(data?.state)}
                       </td>
                       <td className="p-1 whitespace-nowrap text-xs text-gray-900">
@@ -288,9 +305,11 @@ export default function DashTable() {
                       <td className="p-1 text-xs text-gray-900">
                         {data?.projectTags?.Name}
                       </td>
-                      <td className="flex items-center gap-2 border-0 text-xs text-gray-800">
-                        <FiMapPin className="text-blue-600" />
-                        {data?.location || "Unknown"}
+                      <td className="text-xs text-gray-800">
+                        <div className="flex items-center gap-2">
+                          <FiMapPin className="text-blue-600" />
+                          <span>{data?.location || "Unknown"}</span>
+                        </div>
                       </td>
                     </tr>
                   ))}
