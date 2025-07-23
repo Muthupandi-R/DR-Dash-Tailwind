@@ -27,7 +27,7 @@ const thColors = {
   Kubernetes: 'bg-gradient-to-r from-green-100 via-green-50 to-white text-green-700',
 };
 
-const TableLayout = ({ leftTables, rightTables, progressData = {}, onSelectResource }) => {
+const TableLayout = ({ leftTables, rightTables, progressData = {}, selectedRows, setSelectedRows, onSelectResource }) => {
   const leftNonEmpty = leftTables.filter(table => table.data && table.data.length > 0);
   const rightNonEmpty = rightTables.filter(table => table.data && table.data.length > 0);
   const showFullBanner = leftNonEmpty.length === 0 && rightNonEmpty.length === 0;
@@ -48,7 +48,7 @@ const TableLayout = ({ leftTables, rightTables, progressData = {}, onSelectResou
                 {table.label}
               </div>
               <TableComponent data={table.data} bannerColor={table.color} borderColor={table.border} thColor={thColors[table.label]} showCheckbox={true} selectedCloud={selectedCloud} onSelectResource={onSelectResource}  
-             progressData={progressData} />
+             progressData={progressData} selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
             </div>
           ))}
         </div>
