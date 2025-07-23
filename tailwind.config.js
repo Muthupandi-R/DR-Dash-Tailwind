@@ -41,10 +41,15 @@ export default {
           '0%': { 'background-position': '-200% 0' },
           '100%': { 'background-position': '200% 0' },
         },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translate(-50%, -120%)' },
+          '100%': { opacity: '1', transform: 'translate(-50%, -100%)' },
+        },
       },
       animation: {
         slideIn: "slideIn 0.4s ease-out",
         shine: "shine 1.5s linear infinite",
+        fadeIn: 'fadeIn 0.18s ease forwards',
       },
     },
   },

@@ -31,7 +31,7 @@ const DrHeader = ({ onProjectSelect, onInitiateDr }) => {
                 if (isMounted && response) {
                     const options = response.map(project => ({
                         value: project.name,
-                        label: project.tags_Name || project.name
+                        label: project.projectName || project.name
                     }));
                     const allOptions = [defaultProjectOption, ...options];
                     setProjectOptions(allOptions);
