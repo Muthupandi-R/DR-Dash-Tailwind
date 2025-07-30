@@ -1,7 +1,8 @@
+//tableItem.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { FaChevronDown, FaFilter } from "react-icons/fa";
 
-const TabItem = ({ expression, data, activeTab, setActiveTab, selectedFilters, setSelectedFilters }) => {
+const TabItem = ({ expression, data, activeTab, setActiveTab, setSelectedFilters }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [filterInput, setFilterInput] = useState(""); // used for searching
   const [selectedItems, setSelectedItems] = useState([]);
@@ -9,8 +10,6 @@ const TabItem = ({ expression, data, activeTab, setActiveTab, selectedFilters, s
   const dropdownRef = useRef(null);
 
   const isActive = activeTab === expression;
-
-  console.log(isActive, "isActive");
 
   const handleTabClick = () => {
     if (activeTab === expression) {
@@ -31,27 +30,20 @@ const TabItem = ({ expression, data, activeTab, setActiveTab, selectedFilters, s
   );
 
   const handleSelect = (label) => {
-    let updatedSelectedItems = selectedItems.includes(label)
+    const updatedSelectedItems = selectedItems.includes(label)
       ? selectedItems.filter((v) => v !== label)
       : [...selectedItems, label];
   
     setSelectedItems(updatedSelectedItems);
   
-    const joinedValue = updatedSelectedItems.join(",");
-    console.log(joinedValue, "joinedValue");
-  
-    // Update filter in parent
+    const key = expression.toLowerCase();
     setSelectedFilters((prev) => {
       const updatedFilters = { ...prev };
-      const key = expression.toLowerCase();
-  
       if (updatedSelectedItems.length === 0) {
-        delete updatedFilters[key]; // ✅ remove key when no filters selected
+        delete updatedFilters[key];
       } else {
-        updatedFilters[key] = joinedValue; // ✅ use string, not array
+        updatedFilters[key] = updatedSelectedItems.join(","); // ✅ convert array to comma-separated string
       }
-  
-      console.log(updatedFilters, "updatedFilters");
       return updatedFilters;
     });
   };
