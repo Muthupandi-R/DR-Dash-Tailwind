@@ -24,13 +24,16 @@ export default function DashTable() {
   const { selectedCloud } = useContext(ContextApi);
   const [selectedFilters, setSelectedFilters] = useState({});
   const [searchFilter, setSearchFilter] = useState("");
+  const [facets, setFacets] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       setTableLoading(true);
       try {
         const data = await fetchDataDashboard(selectedCloud, selectedFilters, searchFilter);
-        setFilteredData(data);
+        setFacets(data?.facets);
+        setFilteredData(data?.data);
+        console.log("data bala: ", filteredData);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
       } finally {
@@ -71,9 +74,9 @@ export default function DashTable() {
     setSortField(order ? field : null);
     setSortOrder(order);
   
-    if (!filteredData?.data?.length) return;
+    if (!filteredData?.length) return;
   
-    const sorted = [...filteredData.data].sort((a, b) => {
+    const sorted = [...filteredData].sort((a, b) => {
       const aValue = a[field] || "";
       const bValue = b[field] || "";
   
@@ -112,7 +115,7 @@ export default function DashTable() {
   return (
     <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1">
       <div className="mt-2 flex justify-between items-center">
-        <TableTabs facets={filteredData?.facets} setSelectedFilters={setSelectedFilters} />
+        <TableTabs facets={facets} setSelectedFilters={setSelectedFilters} />
         <SearchBar setSearchFilter={setSearchFilter} />
       </div>
       <div className="border border-gray-200 rounded-sm mt-1">
@@ -217,12 +220,12 @@ export default function DashTable() {
                     >
                       Type
                     </th>
-                    <th
+                    {/* <th
                       scope="col"
                       className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
                       Resource Group
-                    </th>
+                    </th> */}
                     <th
                       scope="col"
                       className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
@@ -244,7 +247,7 @@ export default function DashTable() {
                   </tr>
                 </thead>
                 <tbody className="bg-primary-50 divide-y divide-gray-200">
-                  {filteredData?.data?.map((data) => (
+                  {filteredData?.map((data) => (
                     <tr
                       key={data.id}
                       className="hover:bg-gray-50 transition-colors duration-150"
@@ -296,14 +299,14 @@ export default function DashTable() {
                       <td className="p-1 whitespace-nowrap text-xs text-gray-900">
                         {getResourceTypeLabel(data?.type, data?.kind)}
                       </td>
-                      <td className="p-1 whitespace-nowrap text-xs text-gray-900">
-                        {data?.projectName}
-                      </td>
+                      {/* <td className="p-1 whitespace-nowrap text-xs text-gray-900">
+                        {data?.projectTags?.Name || "-"}
+                      </td> */}
                       <td className="p-1 text-xs text-gray-900">
                         {data?.resourceTags?.Name || "-"}
                       </td>
                       <td className="p-1 text-xs text-gray-900">
-                        {data?.projectTags?.Name}
+                        {data?.projectName || "-"}
                       </td>
                       <td className="text-xs text-gray-800">
                         <div className="flex items-center gap-2">

@@ -1,5 +1,5 @@
+//index.jsx
 import axios from "axios";
-
 
 export function getOrderStatus(status) {
   const statusMap = {
@@ -144,7 +144,7 @@ export const statusUpdate = (filteredData, setFilteredData, socketData) => {
   console.log(filteredData, "filteredData");
   
   if(filteredData.length === 0) return;
-    const updatedFiltered = filteredData?.data?.map((item) => {
+    const updatedFiltered = filteredData?.map((item) => {
     const isMatchingId =
       item.id?.toLowerCase() === socketData?.topic?.toLowerCase();
     const isMatchingName = item.name === socketData?.data?.name;
