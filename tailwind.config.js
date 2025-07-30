@@ -45,11 +45,18 @@ export default {
           '0%': { opacity: '0', transform: 'translate(-50%, -120%)' },
           '100%': { opacity: '1', transform: 'translate(-50%, -100%)' },
         },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-4px)' },
+          '50%': { transform: 'translateX(4px)' },
+          '75%': { transform: 'translateX(-4px)' },
+        },
       },
       animation: {
         slideIn: "slideIn 0.4s ease-out",
         shine: "shine 1.5s linear infinite",
         fadeIn: 'fadeIn 0.18s ease forwards',
+        shake: 'shake 0.4s ease-in-out',
       },
     },
   },

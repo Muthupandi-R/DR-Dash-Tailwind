@@ -1,9 +1,13 @@
 import React, { useState, useContext } from "react";
 import TableLayout from "./TableLayout";
 import DrHeader from "./DrHeader";
-import { fetchInitiateDrResources, getDrSuffix } from "../../lib/helpers/index";
+import {
+  fetchInitiateDrResources,
+  getDrSuffix
+} from "../../lib/helpers/index";
 import SkeletonTable from "../Loaders/SkeletonTable";
 import ContextApi from "../../context/ContextApi";
+import {buildAzurePayload, buildAwsPayload, buildGcpPayload, } from "../../lib/helpers/drPayloadUtils";
 
 // Table configuration for different clouds
 const getTableConfigs = (cloud) => {
@@ -109,13 +113,14 @@ const getTableConfigs = (cloud) => {
   return configs[cloud] || configs.azure;
 };
 
-const TableData = () => {
+const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
   const [leftTables, setLeftTables] = useState([]);
   const [rightTables, setRightTables] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tableConfigs, setTableConfigs] = useState([]);
   const [selectedLeftRows, setSelectedLeftRows] = useState([]);
   const [progressData, setProgressData] = useState({}); // Store progress per row
+  const [generatedPayload, setGeneratedPayload] = useState(null);
 
   const { selectedCloud } = useContext(ContextApi);
 
@@ -168,7 +173,7 @@ const TableData = () => {
           ...leftItem,
           id: leftItem.id + "-dr", // ← unique ID for DR progress mapping
           resourceName: leftItem.resourceName + suffix,
-          location: "Central us",
+          location: targetRegion,
           status: "",
         };
       }
@@ -218,189 +223,37 @@ const TableData = () => {
     }
   };
 
-  // Handle project selection
-  const handleProjectSelect = (projectName) => {
-    fetchData(projectName);
-  };
+  // Fetch data when projectName changes
+  React.useEffect(() => {
+    if (projectName) {
+      fetchData(projectName);
+    }
+    // eslint-disable-next-line
+  }, [projectName]);
+
+  const handleSelectResource = (selectedIds) => {
+    setSelectedLeftRows(selectedIds);
+    const filteredRows = selectedIds;
+    let payload = null;
+    if (selectedCloud === "azure") {
+      payload = buildAzurePayload(filteredRows, projectName);
+    } else if (selectedCloud === "aws") {
+      payload = buildAwsPayload(filteredRows);
+    } else if (selectedCloud === "gcp") {
+      payload = buildGcpPayload(filteredRows);
+    }
+    setGeneratedPayload(payload);
+  };   
 
   const handleInitiateDr = () => {
-    const updatedProgress = {};
+    const updatedProgress = {};  
 
-    // Map rows by ID for quick lookup
-    const updatedRows = Object.fromEntries(
-      selectedLeftRows.map((row) => [row.id, true])
-    );
-    console.log(updatedRows, "updatedRows");
-    
-
-    // Prepare payload
-    let payload = null;
-
-    if (selectedCloud === "azure") {
-      payload = selectedLeftRows
-        .filter((item) => updatedRows[item.id] && item.id)
-        .reduce(
-          (acc, item) => {
-            if (!acc.subscriptionId) {
-              acc.subscriptionId = "d6240a3c-34a4-4a5c-955b-06228bf34ca8"; // hardcoded or dynamic
-              acc.resourceGroupName = "selected-rg"; // replace with real `selectedValue` if you have it in state
-              acc.targetRegion = "centralus";
-              acc.resourceSuffix = "cus-dr";
-              acc.provider = "azure";
-            }
-
-            const type = item.type?.toLowerCase();
-            if (
-              type === "appservice" &&
-              !acc.webApps.includes(item.resourceName)
-            ) {
-              acc.webApps.push(item.resourceName);
-            } else if (
-              type === "functionapp" &&
-              !acc.functionApps.includes(item.resourceName)
-            ) {
-              acc.functionApps.push(item.resourceName);
-            } else if (
-              type === "virtualmachine" &&
-              !acc.virtualMachines.includes(item.resourceName)
-            ) {
-              acc.virtualMachines.push(item.resourceName);
-            } else if (
-              type === "sqlservers" &&
-              !acc.sqlServers.includes(item.resourceName)
-            ) {
-              acc.sqlServers.push(item.resourceName);
-            } else if (
-              type === "logicapp" &&
-              !acc.logicApps.includes(item.resourceName)
-            ) {
-              acc.logicApps.push(item.resourceName);
-            } else if (
-              type === "kubernetes" &&
-              !acc.kubernetes.includes(item.resourceName)
-            ) {
-              acc.kubernetes.push(item.resourceName);
-            }
-
-            return acc;
-          },
-          {
-            subscriptionId: null,
-            resourceGroupName: null,
-            targetRegion: null,
-            resourceSuffix: null,
-            webApps: [],
-            functionApps: [],
-            virtualMachines: [],
-            sqlServers: [],
-            logicApps: [],
-            kubernetes: [],
-            provider: null,
-          }
-        );
-    } else if (selectedCloud === "aws") {
-      payload = selectedLeftRows
-        .filter((item) => updatedRows[item.id] && item.id)
-        .reduce(
-          (acc, item) => {
-            if (!acc.provider) {
-              acc.provider = "aws";
-              acc.sourceRegion = item.location?.toLowerCase() || "us-east-2";
-              acc.targetRegion = "us-west-1";
-              acc.resourceSuffix = "-dr";
-            }
-
-            const type = item.type?.toLowerCase();
-            if (type === "ec2" && !acc.ec2Ids.includes(item.resourceName)) {
-              acc.ec2Ids.push(item.resourceName);
-            } else if (
-              type === "rds" &&
-              !acc.rdsIds.includes(item.resourceName)
-            ) {
-              acc.rdsIds.push(item.resourceName);
-            } else if (
-              type === "lambda" &&
-              !acc.lambdaIds.includes(item.resourceName)
-            ) {
-              acc.lambdaIds.push(item.resourceName);
-            } else if (
-              type === "eks" &&
-              !acc.eksIds.includes(item.resourceName)
-            ) {
-              acc.eksIds.push(item.resourceName);
-            }
-
-            return acc;
-          },
-          {
-            provider: null,
-            sourceRegion: null,
-            targetRegion: null,
-            resourceSuffix: null,
-            ec2Ids: [],
-            rdsIds: [],
-            lambdaIds: [],
-            eksIds: [],
-          }
-        );
-    } else if (selectedCloud === "gcp") {
-      payload = selectedLeftRows
-        .filter((item) => updatedRows[item.id] && item.id)
-        .reduce(
-          (acc, item) => {
-            if (!acc.provider) {
-              acc.provider = "gcp";
-              acc.sourceRegion = item.location?.toLowerCase() || "us-east-2";
-              acc.targetRegion = "us-central1";
-              acc.resourceSuffix = "-drdd";
-              acc.sourceProjectId = "drd-project-462808";
-              acc.sourceProjectName = "selected-project"; // replace with actual project
-            }
-
-            const type = item.type?.toLowerCase();
-            if (
-              type === "computeengine" &&
-              !acc.gceIds.includes(item.resourceName)
-            ) {
-              acc.gceIds.push(item.resourceName);
-              acc.gceSourceZone = "-b";
-              acc.gceTargetZone = "-a";
-            } else if (
-              type === "sql" &&
-              !acc.sqlIds.includes(item.resourceName)
-            ) {
-              acc.sqlIds.push(item.resourceName);
-            } else if (
-              type === "gke" &&
-              !acc.gkeIds.includes(item.resourceName)
-            ) {
-              acc.gkeIds.push(item.resourceName);
-            }
-
-            return acc;
-          },
-          {
-            provider: null,
-            sourceRegion: null,
-            targetRegion: null,
-            resourceSuffix: null,
-            sourceProjectId: "",
-            sourceProjectName: "",
-            gceIds: [],
-            sqlIds: [],
-            gkeIds: [],
-            gceSourceZone: "",
-            gceTargetZone: "",
-          }
-        );
-    }
-
-    console.log("🚀 DR Payload", payload);
+    console.log("🚀 DR Payload", generatedPayload);
 
     // Optionally call your DR initiation API
     // await initiateDR(payload);
 
-    // Initialize progress bar for UI animation      
+    // Initialize progress bar for UI animation
     selectedLeftRows.forEach((row) => {
       updatedProgress[row.id] = 100;
       updatedProgress[row.id + "-dr"] = 0;
@@ -444,11 +297,14 @@ const TableData = () => {
   return (
     <>
       <DrHeader
-        onProjectSelect={handleProjectSelect}
+        projectName={projectName}
+        sourceRegion={sourceRegion}
+        targetRegion={targetRegion}
         onInitiateDr={handleInitiateDr}
+        onBack={onBack}
       />
       {loading ? (
-        <div className="flex gap-8 mt-10">
+        <div className="flex gap-8 mt-8">
           <div className="flex-1 flex flex-col gap-8">
             {leftSkeletons.map((_, idx) => (
               <SkeletonTable key={idx} />
@@ -467,9 +323,7 @@ const TableData = () => {
           progressData={progressData}
           selectedRows={selectedLeftRows}
           setSelectedRows={setSelectedLeftRows}
-          onSelectResource={(selectedIds) => {
-            setSelectedLeftRows(selectedIds);
-          }}
+          onSelectResource={handleSelectResource}
         />
       )}
     </>
