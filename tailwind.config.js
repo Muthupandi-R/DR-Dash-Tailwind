@@ -22,34 +22,25 @@ export default {
           800: colors.blue[800],
           900: colors.blue[900],
         },
-        gradientPrimary: {
-          DEFAULT: "bg-gradient-to-l from-primary-200 via-primary-300 to-primary-200",
-        },
-        gradientSecondary: {
-          DEFAULT: "bg-gradient-to-l from-primary-50 via-primary-800 to-primary-50",
-        },
-        gradientBg: {
-          DEFAULT: "bg-gradient-to-b from-[#7b2ff2] to-[#22c1c3]",
-        },
       },
       keyframes: {
         slideIn: {
-          "0%": { opacity: 0, transform: "translateX(100%)" },
-          "100%": { opacity: 1, transform: "translateX(0)" },
+          "0%": { opacity: 0, transform: "tranblueX(100%)" },
+          "100%": { opacity: 1, transform: "tranblueX(0)" },
         },
         shine: {
           '0%': { 'background-position': '-200% 0' },
           '100%': { 'background-position': '200% 0' },
         },
         fadeIn: {
-          '0%': { opacity: '0', transform: 'translate(-50%, -120%)' },
-          '100%': { opacity: '1', transform: 'translate(-50%, -100%)' },
+          '0%': { opacity: '0', transform: 'tranblue(-50%, -120%)' },
+          '100%': { opacity: '1', transform: 'tranblue(-50%, -100%)' },
         },
         shake: {
-          '0%, 100%': { transform: 'translateX(0)' },
-          '25%': { transform: 'translateX(-4px)' },
-          '50%': { transform: 'translateX(4px)' },
-          '75%': { transform: 'translateX(-4px)' },
+          '0%, 100%': { transform: 'tranblueX(0)' },
+          '25%': { transform: 'tranblueX(-4px)' },
+          '50%': { transform: 'tranblueX(4px)' },
+          '75%': { transform: 'tranblueX(-4px)' },
         },
       },
       animation: {
@@ -60,6 +51,15 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [function ({ addBase, theme }) {
+    addBase({
+      ':root': {
+        '--tab-bg-primary': theme('colors.primary.50'),
+        '--tab-bg': theme('colors.primary.100'),
+        '--tab-last-circle-bg' : theme('colors.primary.300'),
+      },
+    });
+  },
+],
 }
 

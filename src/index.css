@@ -25,6 +25,158 @@
 		@apply text-sky-500 ;
 	}
 }
+
 .apexcharts-legend-marker {
 	display: none !important;
+  }
+
+/* Reset and base styling */
+.tabs {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	overflow: hidden;
+  }
+  
+  .tabs li {
+	float: left; 
+	position: relative;
+  }
+  
+  /* Tab clickable area */
+  .tabs a {
+	float: left;
+	padding: 8px 20px;
+	text-decoration: none;
+	color: black;
+	background: var(--tab-bg);
+  
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	position: relative;
+	z-index: 2;
+  }
+  
+  /* Active tab styling */
+  .tabs .active {
+	z-index: 3;
+  }
+  
+  .tabs .active a {
+	background: var(--tab-bg-primary);
+	color: black;
+  }
+  
+  /* Background blend pseudo elements */
+  .tabs li:before,
+  .tabs li:after,
+  .tabs li a:before,
+  .tabs li a:after {
+	position: absolute;
+	bottom: 0;
+  }
+  /* Only the first, last, and active tabs need pseudo elements at all */
+  .tabs li:first-child:before,
+  .tabs li:first-child a:before,
+  .tabs .active:after,
+  .tabs .active:before,
+  .tabs .active a:after,
+  .tabs .active a:before {
+	  content: "";
+  }
+  .tabs .active:before,
+  .tabs .active:after {
+	  background: var(--tab-bg-primary);
+	  /* Squares below circles */
+	  z-index: 1;
+  }
+
+  /* Side squares (to cover gaps between tabs) */
+  .tabs li:before,
+  .tabs li:after {
+	background: var(--tab-bg-primary);;
+	width: 10px;
+	height: 10px;
+	z-index: 1;
+  }
+ 
+  .tabs li:before {
+	left: -10px;
+  }
+  
+  .tabs li:after {
+	right: -10px;
+  }
+  
+  /* Rounded corners (like Chrome tabs) */
+  .tabs li a:before,
+  .tabs li a:after {
+	width: 20px;
+	height: 20px;
+	border-radius: 10px;
+	background: var(--tab-last-circle-bg);
+	z-index: 2;
+  }
+    /* Active tab rounded edges */
+	.tabs .active a:before,
+	.tabs .active a:after {
+	  background: var(--tab-bg);
+	  z-index: 1;
+	}
+  
+  /* Edge tabs (first/last) with different background */
+  .tabs li:first-child.active a:before {
+	background: var(--tab-last-circle-bg);
+  }
+  .tabs li.last-tab.active a:after {
+	background: var(--tab-last-circle-bg);
+  }
+  .tabs li a:before {
+	left: -20px;
+  }
+  
+  .tabs li a:after {
+	right: -20px;
+  }
+  
+  .tab-icon {
+	width: 16px;
+	height: 16px;
+	border-radius: 9999px;
+	margin-right: 6px;
+	object-fit: cover;
+  }
+
+  .tab-close {
+	margin-left: 28px;
+	color: #666;
+	background: none;
+	border: none;
+	font-size: 1rem;
+	cursor: pointer;
+	padding: 0px 3px;
+	z-index: 4;
+  }
+  
+  .tab-close:hover {
+	color: red;
+	background-color: var(--tab-last-circle-bg);
+	border-radius: 25px;
+	z-index: 4;
+  }
+  
+  .tab-add {
+	display: flex;
+	align-items: center;
+	/* padding: 6px;	 */
+	left: 5px;
+	background: transparent;
+	border: none;
+	font-size: 1.2rem;
+	cursor: pointer;
+	color: #6b46c1;
+	position: relative;
+	border-radius: 25px;
+	z-index: 4;
   }

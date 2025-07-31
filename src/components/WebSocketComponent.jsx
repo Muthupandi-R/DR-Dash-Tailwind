@@ -53,7 +53,7 @@ const WebSocketComponent = () => {
   
 
   return (
-    <div>
+    <div className='w-full h-full pt-'>
       <h2>WebSocket Messages</h2>
       <ul>
         {messages.map((msg, index) => (
