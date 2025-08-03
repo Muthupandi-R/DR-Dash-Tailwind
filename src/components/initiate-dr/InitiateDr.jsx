@@ -25,7 +25,8 @@ const InitiateDr = () => {
 
   const handleAddTab = () => {
     if (tabs.length >= MAX_TABS) return;
-    const newTabId = tabs.length + 1;
+    // const newTabId = tabs.length + 1;
+    const newTabId = Math.max(...tabs.map(t => t.id)) + 1;
     const newTab = {
       id: newTabId,
       name: `New Project Tab${newTabId}`,
@@ -39,7 +40,6 @@ const InitiateDr = () => {
     setTabs([...tabs, newTab]);
     setActiveTab(newTabId);
   };
-  console.log('muthu')
 
   const handleRemoveTab = (tabId) => {
     const tabIdx = tabs.findIndex((tab) => tab.id === tabId);
@@ -58,7 +58,9 @@ const InitiateDr = () => {
   const handleSelectionNext = (tabId, { projectName, sourceRegion, targetRegion }) => {
     setTabs(tabs => tabs.map(tab =>
       tab.id === tabId
-        ? { ...tab, step: "table", selection: { projectName, sourceRegion, targetRegion } }
+        ? { ...tab, step: "table",
+             name: projectName,
+           selection: { projectName, sourceRegion, targetRegion } }
         : tab
     ));
   };
@@ -66,11 +68,13 @@ const InitiateDr = () => {
   const handleBack = (tabId) => {
     setTabs(tabs => tabs.map(tab =>
       tab.id === tabId
-        ? { ...tab, step: "selection" }
+        ? { ...tab, step: "selection",
+          name: "New Project Tab",
+         }
         : tab
     ));
   };
-
+console.log(tabs, "tabs")
   return (
     <div className="w-full h-full p-1 px-0 overflow-y-auto mt-10">
       {/* Top Tabs */}
@@ -97,7 +101,7 @@ const InitiateDr = () => {
                       alt="Tab Icon"
                       className="tab-icon w-6 h-6"
                     />
-                    <span className="text-xs text-primary-900">{tab.name}</span>
+                    <span className="text-xs text-primary-900">{tab?.name || "New Project Tab"}</span>
                   </div>
 
                   {/* Right side: Close button */}
@@ -124,7 +128,7 @@ const InitiateDr = () => {
             <li>
               <button
                 onClick={handleAddTab}
-                className="tab-add hover:text-primary-100 hover:bg-primary-500 hover:rounded-2xl h-7 w-full top-1 p-2"
+                className="tab-add hover:text-primary-100 hover:bg-primary-500 hover:rounded-2xl h-7 w-full top-0.5 p-2"
                 title="Add new tab"
               >
                 +

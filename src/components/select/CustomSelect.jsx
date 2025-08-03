@@ -24,11 +24,11 @@ const CustomSelect = ({
           className="appearance-none w-full px-4 py-2 text-sm bg-gradient-to-r from-blue-50 via-white to-purple-50 border border-gray-200 rounded-xl shadow-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 disabled:opacity-50 transition-all duration-200 hover:shadow-lg hover:border-primary-300"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}   
+          disabled={disabled}        
         >
           <option value="">Select {label}</option>
           {options.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option key={option.value} value={option.value} disabled={label !== "Project Name" && option?.value !== value} >
               {option.label}
             </option>
           ))}
