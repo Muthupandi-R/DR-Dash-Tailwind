@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CustomSelect from "../select/CustomSelect";
-import { fetchProjects } from "../../lib/helpers/index";
+import { fetchProjects } from "../../services/apiService";
 
 const REGION_OPTIONS = {
   azure: ["East US", "Central US", "Southeast Asia"],

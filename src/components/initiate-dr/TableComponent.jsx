@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import ReactDOM from "react-dom";
-import { getOrderStatus } from "../../lib/helpers/index";
-import DEFAULT_IMG from "../../assets/azure-function-app.png";
+import { getOrderStatus } from "../../services/apiService";
+import DEFAULT_IMG from "../../assets/Icons/azure/functionapp.png";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { getIcon } from "../../utils/iconMap";
 import { FiMapPin } from "react-icons/fi";

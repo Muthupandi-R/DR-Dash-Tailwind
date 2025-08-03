@@ -1,18 +1,18 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import awsLogo from "../assets/aws-logo.png";
-import azureLogo from "../assets/azure-logo.png";
-import gcpLogo from "../assets/gcp-logo.png";
-import azureFunctionAppIcon from "../assets/azure-function-app.png";
-import azureAksIcon from "../assets/azure-aks.png";
-import awsLambdaIcon from "../assets/aws-lambda.png";
-import gcpSqlIcon from "../assets/gcp-sql.png";
-import awsEc2Icon from "../assets/aws-ec2.png";
-import gcpComputeEngineIcon from "../assets/gcp-compute-engine.png";
+import awsLogo from "../../assets/loginIcons/aws-logo.png";
+import azureLogo from "../../assets/loginIcons/azure-logo.png";
+import gcpLogo from "../../assets/loginIcons/gcp-logo.png";
+import azureFunctionAppIcon from "../../assets/loginIcons/azure-function-app.png";
+import azureAksIcon from "../../assets/loginIcons/azure-aks.png";
+import awsLambdaIcon from "../../assets/loginIcons/aws-lambda.png";
+import gcpSqlIcon from "../../assets/loginIcons/gcp-sql.png";
+import awsEc2Icon from "../../assets/loginIcons/aws-ec2.png";
+import gcpComputeEngineIcon from "../../assets/loginIcons/gcp-compute-engine.png";
 import './AnimatedLogin.css';
-import earthGif from '../assets/earth-rotate.gif'; // adjust path if needed
+import earthGif from '../../assets/loginIcons/earth-rotate.gif'; // adjust path if needed
 import { useContext } from "react";
-import ContextApi from "../context/ContextApi";
+import ContextApi from "../../context/ContextApi";
 export default function Login() {
   const { handleCloudChange } = useContext(ContextApi);
   const clouds = [
@@ -51,27 +51,12 @@ export default function Login() {
   
   function CloudCard({ cloud, onClick }) {
     const cardRef = useRef(null);
-  
-    const handleMouseMove = (e) => {
-      const card = cardRef.current;
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-      card.style.transform = `rotateY(${x / 12}deg) rotateX(${-y / 16}deg) scale(1.05)`;
-    };
-  
-    const handleMouseLeave = () => {
-      const card = cardRef.current;
-      card.style.transform = "";
-    };
-  
+
     return (
       <button
         ref={cardRef}
         onClick={onClick}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className={`group relative flex flex-col items-center justify-center w-55 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm`}
+        className={`group relative flex flex-col items-center justify-center w-55 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm card-entrance`}
         style={{ 
           boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)"
         }}

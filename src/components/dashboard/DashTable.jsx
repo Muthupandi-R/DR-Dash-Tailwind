@@ -4,7 +4,7 @@ import {
   getOrderStatus,
   getResourceTypeLabel,
   statusUpdate,
-} from "../../lib/helpers";
+} from "../../services/apiService";
 import { FiMapPin } from "react-icons/fi";
 import SkeletonTable from "../Loaders/SkeletonTable";
 import TableTabs from "./tabs/TableTabs";
@@ -25,24 +25,14 @@ export default function DashTable() {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [searchFilter, setSearchFilter] = useState("");
   const [facets, setFacets] = useState([]);
+  const [paginationTokens, setPaginationTokens] = useState([]); // initial page = ""
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setTableLoading(true);
-      try {
-        const data = await fetchDataDashboard(selectedCloud, selectedFilters, searchFilter);
-        setFacets(data?.facets);
-        setFilteredData(data?.data);
-        console.log("data bala: ", filteredData);
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-      } finally {
-        setTableLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedFilters, searchFilter]);
+    setPaginationTokens([""]); // reset to first page
+    setCurrentPage(0);
+    fetchPaginatedData(0); // initial load
+  }, [selectedCloud, selectedFilters, searchFilter]);
 
   useEffect(() => {
     statusUpdate(filteredData, setFilteredData, socketData);
@@ -86,19 +76,13 @@ export default function DashTable() {
     });
   
     // update the filteredData.data with sorted version
-    setFilteredData((prev) => ({
-      ...prev,
-      data: sorted,
-    }));
+    setFilteredData(sorted);
   
     setSortMenuOpen(false);
     if (!order) {
       setSortField(null);
       setSortOrder(null);
-    
-      // re-fetch unsorted data from backend
-      fetchDataDashboard(selectedCloud, selectedFilters, searchFilter).then(setFilteredData);
-      return;
+      return fetchPaginatedData(0);
     }
   };
   
@@ -111,7 +95,35 @@ export default function DashTable() {
       <div className="w-4 h-4 rounded bg-gray-200 animate-pulse" />
     );
   };
+  const fetchPaginatedData = async (pageNumber) => {
 
+    setTableLoading(true);
+    try {
+      const tokenToUse = paginationTokens[pageNumber] || "";
+      const data = await fetchDataDashboard(selectedCloud, selectedFilters, searchFilter, tokenToUse);
+  
+      setFilteredData(data?.data || []);
+      setFacets(data?.facets || []);
+  
+      const newSkipToken = data?.$skipToken;
+
+    if (newSkipToken
+    ) {
+      setPaginationTokens((prev) => {
+        if (!prev.includes(newSkipToken)) {
+          return [...prev, newSkipToken];
+        }
+        return prev; // don't update if token already exists
+      });
+      }
+      setCurrentPage(pageNumber);
+    } catch (err) {
+      console.error("Pagination error:", err);
+    } finally {
+      setTableLoading(false);
+    }
+  };
+  
   return (
     <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1">
       <div className="mt-2 flex justify-between items-center">
@@ -200,7 +212,8 @@ export default function DashTable() {
                             <span className="text-gray-700">↓ Desc</span>
                           </button>
                           <button
-                            className="w-full px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
+                            className={`w-full px-3 py-2 hover:bg-gray-100 flex items-center gap-2 ${!sortField ? "opacity-50 cursor-not-allowed" : ""}`}
+                            disabled = { !sortField}
                             onClick={() => applySort("name", null)}
                           >
                             <span className="text-gray-700">✕ Remove</span>
@@ -212,7 +225,7 @@ export default function DashTable() {
                       scope="col"
                       className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
                     >
-                      Status
+                      State
                     </th>
                     <th
                       scope="col"
@@ -258,8 +271,8 @@ export default function DashTable() {
                         checked={selectedIds.includes(data.id)}
                         onChange={(e) => handleRowCheckboxChange(e, data.id)}
                       /> */}
-                        <div class="inline-flex items-center">
-                          <label class="flex items-center cursor-pointer relative">
+                        <div className="inline-flex items-center">
+                          <label className="flex items-center cursor-pointer relative">
                             <input
                               type="checkbox"
                               checked={selectedIds.includes(data.id)}
@@ -268,19 +281,19 @@ export default function DashTable() {
                                 handleRowCheckboxChange(e, data.id)
                               }
                             />
-                            <span class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                class="h-3.5 w-3.5"
+                                className="h-3.5 w-3.5"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
                                 stroke="currentColor"
-                                stroke-width="1"
+                                strokeWidth="1"
                               >
                                 <path
-                                  fill-rule="evenodd"
+                                  fillRule="evenodd"
                                   d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clip-rule="evenodd"
+                                  clipRule="evenodd"
                                 ></path>
                               </svg>
                             </span>
@@ -323,7 +336,20 @@ export default function DashTable() {
         )}
       </div>
       <div className="flex justify-end mt-2">
-        <Pagination />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={paginationTokens.length}
+        onNext={() => {
+          if (currentPage + 1 < paginationTokens.length) {
+            fetchPaginatedData(currentPage + 1);
+          }
+        }}
+        onPrev={() =>  {
+          if (currentPage > 0) {
+            fetchPaginatedData(currentPage - 1);
+          }
+        }}
+      />
       </div>
     </div>
   );

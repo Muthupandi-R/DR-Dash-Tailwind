@@ -59,7 +59,7 @@ export function getOrderStatus(status) {
   );
 }
 
-export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, searchFilter = "") {
+export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, searchFilter = "", skipToken = "") {
   try {
     // const selconst { selectedCloud } = useContext(ContextApi);
 
@@ -75,8 +75,11 @@ export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, s
     if (searchFilter.trim() !== "") {
       queryParams.push(`searchFilter=${encodeURIComponent(searchFilter.trim())}`);
     }
+    if (skipToken) {
+      queryParams.push(`skipToken=${encodeURIComponent(skipToken)}`);
+    }
 
-    queryParams.push("top=20");
+    queryParams.push("top=5");
 
     apiUrl += queryParams.join("&");
     const response = await axios.get(apiUrl);
