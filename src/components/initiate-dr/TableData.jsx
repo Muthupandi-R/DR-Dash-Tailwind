@@ -4,10 +4,10 @@ import DrHeader from "./DrHeader";
 import {
   fetchInitiateDrResources,
   getDrSuffix
-} from "../../lib/helpers/index";
+} from "../../services/apiService";
 import SkeletonTable from "../Loaders/SkeletonTable";
 import ContextApi from "../../context/ContextApi";
-import {buildAzurePayload, buildAwsPayload, buildGcpPayload, } from "../../lib/helpers/drPayloadUtils";
+import {buildAzurePayload, buildAwsPayload, buildGcpPayload, } from "../../utils/drPayloadUtils";
 
 // Table configuration for different clouds
 const getTableConfigs = (cloud) => {

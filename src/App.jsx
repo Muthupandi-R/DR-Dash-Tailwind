@@ -1,6 +1,6 @@
 import { useState } from "react";
-import SidebarLayout from "./components/SidebarLayout";
-import Navbar from "./components/Navbar";
+import SidebarLayout from "./components/common/SidebarLayout";
+import Navbar from "./components/common/Navbar";
 
 export default function App({ children }) {
   const [expanded, setExpanded] = useState(true);

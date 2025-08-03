@@ -1,7 +1,7 @@
 import { Card, CardBody } from "@material-tailwind/react";
 import Chart from "react-apexcharts";
 import PropTypes from "prop-types";
-import { fetchResourceStats } from "../../lib/helpers";
+import { fetchResourceStats } from "../../services/apiService";
 import { useState, useMemo, useEffect } from "react";
 import SkeletonPieChart from "../Loaders/SkeletonPieChart";
 import ContextApi from "../../context/ContextApi";

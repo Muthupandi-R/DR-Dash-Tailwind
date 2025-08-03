@@ -4,7 +4,7 @@ import {
   getOrderStatus,
   getResourceTypeLabel,
   statusUpdate,
-} from "../../lib/helpers";
+} from "../../services/apiService";
 import { FiMapPin } from "react-icons/fi";
 import SkeletonTable from "../Loaders/SkeletonTable";
 import TableTabs from "./tabs/TableTabs";

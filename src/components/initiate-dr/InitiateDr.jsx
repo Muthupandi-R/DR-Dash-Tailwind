@@ -4,7 +4,7 @@ import SelectionStep from "./SelectionStep";
 import DrHeader from "./DrHeader";
 import ContextApi from "../../context/ContextApi";
 import project1 from "../../images/project.png";
-
+import './tabs.css'
 const MAX_TABS = 5;
 
 const defaultTab = {

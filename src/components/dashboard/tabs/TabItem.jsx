@@ -102,8 +102,11 @@ const TabItem = ({ expression, data, activeTab, setActiveTab, setSelectedFilters
             isDropdownOpen ? "rotate-180" : ""
           }`}
         />
-            {selectedItems.length > 0 && (
-            <span className="relative bottom-1 right-0 w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          {selectedItems.length > 0 && (
+            <span className="relative flex bottom-1 w-2 h-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-primary-800 opacity-75 animate-ping"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-600"></span>
+            </span>
           )}
       </div>
 

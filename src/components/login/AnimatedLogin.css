@@ -1,0 +1,126 @@
+@keyframes blob1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 20px) scale(1.1); }
+}
+@keyframes blob2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-20px, 30px) scale(1.05); }
+}
+@keyframes blob3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10px, -20px) scale(1.08); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-blob1 { animation: blob1 12s ease-in-out infinite; }
+.animate-blob2 { animation: blob2 16s ease-in-out infinite; }
+.animate-blob3 { animation: blob3 18s ease-in-out infinite; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+
+/* Floating resource icons animation */
+@keyframes floating {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) rotate(0deg); 
+  }
+  25% { 
+    transform: translateY(-20px) translateX(10px) rotate(2deg); 
+  }
+  50% { 
+    transform: translateY(-10px) translateX(-5px) rotate(-1deg); 
+  }
+  75% { 
+    transform: translateY(-15px) translateX(15px) rotate(1deg); 
+  }
+}
+
+.floating-icon {
+  animation: floating ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.floating-icon:hover {
+  pointer-events: auto;
+  z-index: 15;
+}
+
+/* Shining sweep effect for cards */
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+.shine {
+  display: block;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+}
+.shine::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(120deg, rgba(255,255,255,0) 60%, rgba(255,255,255,0.5) 80%, rgba(255,255,255,0) 100%);
+  transform: translateX(-100%) skewX(-20deg);
+  transition: none;
+}
+.shine-effect:hover .shine::before {
+  animation: shine-sweep 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes shine-sweep {
+  0% { transform: translateX(-100%) skewX(-20deg); }
+  80% { transform: translateX(120%) skewX(-20deg); }
+  100% { transform: translateX(120%) skewX(-20deg); }
+}
+
+/* Missing animation classes that are used in Login component */
+@keyframes shine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-shine {
+  animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out forwards;
+}
+
+/* Card initial entrance animation */
+@keyframes card-entrance {
+  0% {
+    opacity: 0;
+    transform: translateY(100px) rotateY(0deg) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateY(360deg) scale(1);
+  }
+}
+
+.card-entrance {
+  animation: card-entrance 1.2s ease-out forwards;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  transition: transform 0.3s ease-out;
+}
+
+/* Staggered animation for multiple cards */
+.card-entrance:nth-child(1) { animation-delay: 0.1s; }
+.card-entrance:nth-child(2) { animation-delay: 0.3s; }
+.card-entrance:nth-child(3) { animation-delay: 0.5s; }
+
+/* CSS-only hover effects (delayed to avoid conflicts) */
+.card-entrance:hover {
+  transform: rotateY(5deg) rotateX(5deg) scale(1.05) !important;
+  transition-delay: 1.5s; /* Wait for entrance animation to complete */
+}
