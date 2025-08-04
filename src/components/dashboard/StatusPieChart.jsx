@@ -208,13 +208,13 @@ function PieChart({ data, title, colors, onSegmentClick, legendPosition }) {
   };
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex items-center justify-center text-center ">
       {/* Animated gradient blob behind the card */}
       <div className="absolute -z-10 w-60 h-60 bg-gradient-to-tr from-blue-400 via-purple-300 to-pink-300 rounded-full blur-3xl opacity-30 animate-pulse scale-110" />
       <Card className="h-full bg-primary-50 backdrop-blur-md border-2 border-transparent bg-clip-padding shadow-2xl rounded-2xl transition-all duration-300 hover:shadow-[0_8px_40px_8px_rgba(80,80,255,0.15)] hover:border-blue-200/60 hover:ring-4 hover:ring-blue-200/30">
         <CardBody className="h-full grid place-items-center px-2 py-4">
           <div className="w-full h-full flex flex-col justify-center items-left">
-            <h3 className="text-sm font-semibold text-gray-800 mb-2 px-2 py-1 text-primary-800">{title}</h3>
+            <h3 className="text-sm font-semibold text-gray-800 mb-2 px-2 py-1  text-primary-800 ">{title}</h3>
             <div className="w-full h-full flex justify-center items-center mt-4">
               <Chart
                 key={labels.join('-') + series.join('-')}

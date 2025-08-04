@@ -13,6 +13,7 @@ import './AnimatedLogin.css';
 import earthGif from '../../assets/loginIcons/earth-rotate.gif'; // adjust path if needed
 import { useContext } from "react";
 import ContextApi from "../../context/ContextApi";
+
 export default function Login() {
   const { handleCloudChange } = useContext(ContextApi);
   const clouds = [
@@ -139,7 +140,7 @@ export default function Login() {
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-8">
-        <h1 className="relative text-5xl md:text-6xl font-extrabold mb-4 text-center overflow-hidden">
+        <h1 className="relative text-5xl md:text-6xl font-extrabold mb-4 text-center overflow-hidden animate-fade-in">
           <span
             className="inline-block bg-[linear-gradient(110deg,#a5f3fc,60%,#fff,80%,#c4b5fd)] bg-[length:200%_100%] bg-clip-text text-transparent animate-shine"
             style={{ WebkitBackgroundClip: 'text', backgroundClip: 'text' }}
