@@ -51,7 +51,7 @@ export function getOrderStatus(status) {
       className={`capitalize py-1 px-2 rounded-md text-xs inline-flex items-center gap-2 ${textColor} ${bgColor}`}
     >
       <span
-        className="w-2 h-2 rounded-[2px] text-xs"
+        className="w-2 h-2 rounded-md text-xs"
         style={{ backgroundColor: dotColor }}
       ></span>
       <span className="text-xs">{status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : ''}</span>
@@ -59,7 +59,7 @@ export function getOrderStatus(status) {
   );
 }
 
-export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, searchFilter = "", skipToken = "") {
+export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, searchFilter = "", skipToken = "", pageSize = 5) {
   try {
     // const selconst { selectedCloud } = useContext(ContextApi);
 
@@ -79,7 +79,7 @@ export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, s
       queryParams.push(`skipToken=${encodeURIComponent(skipToken)}`);
     }
 
-    queryParams.push("top=5");
+    queryParams.push(`top=${pageSize}`);
 
     apiUrl += queryParams.join("&");
     const response = await axios.get(apiUrl);

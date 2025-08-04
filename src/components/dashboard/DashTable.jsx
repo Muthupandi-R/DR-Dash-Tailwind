@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import {
   fetchDataDashboard,
   getOrderStatus,
@@ -20,6 +20,7 @@ export default function DashTable() {
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState(null); // 'asc' | 'desc' | null
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const sortMenuRef = useRef(null);
   const { socketData } = useContext(ContextApi);
   const { selectedCloud } = useContext(ContextApi);
   const [selectedFilters, setSelectedFilters] = useState({});
@@ -27,16 +28,34 @@ export default function DashTable() {
   const [facets, setFacets] = useState([]);
   const [paginationTokens, setPaginationTokens] = useState([]); // initial page = ""
   const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
 
   useEffect(() => {
     setPaginationTokens([""]); // reset to first page
     setCurrentPage(0);
     fetchPaginatedData(0); // initial load
-  }, [selectedCloud, selectedFilters, searchFilter]);
+  }, [selectedCloud, selectedFilters, searchFilter, pageSize]);
 
   useEffect(() => {
     statusUpdate(filteredData, setFilteredData, socketData);
   }, [socketData]); 
+
+  // Handle click outside to close sort menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sortMenuRef.current && !sortMenuRef.current.contains(event.target)) {
+        setSortMenuOpen(false);
+      }
+    };
+
+    if (sortMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [sortMenuOpen]);
 
   const isAllSelected =
     filteredData.length > 0 && selectedIds.length === filteredData.length;
@@ -58,6 +77,12 @@ export default function DashTable() {
     } else {
       setSelectedIds((prev) => prev.filter((id) => id !== rowId));
     }
+  };
+
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setPaginationTokens([""]); // reset to first page
+    setCurrentPage(0);
   };
 
   const applySort = (field, order) => {
@@ -100,7 +125,7 @@ export default function DashTable() {
     setTableLoading(true);
     try {
       const tokenToUse = paginationTokens[pageNumber] || "";
-      const data = await fetchDataDashboard(selectedCloud, selectedFilters, searchFilter, tokenToUse);
+      const data = await fetchDataDashboard(selectedCloud, selectedFilters, searchFilter, tokenToUse, pageSize);
   
       setFilteredData(data?.data || []);
       setFacets(data?.facets || []);
@@ -125,7 +150,7 @@ export default function DashTable() {
   };
   
   return (
-    <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1">
+    <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1 ">
       <div className="mt-2 flex justify-between items-center">
         <TableTabs facets={facets} setSelectedFilters={setSelectedFilters} />
         <SearchBar setSearchFilter={setSearchFilter} />
@@ -198,7 +223,7 @@ export default function DashTable() {
                       </div>
 
                       {sortMenuOpen && (
-                        <div className="absolute top-12 right-0 z-10 w-32 bg-white border rounded shadow-lg text-xs">
+                        <div ref={sortMenuRef} className="absolute top-12 right-0 z-10 w-32 bg-white border rounded shadow-lg text-xs">
                           <button
                             className="w-full px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
                             onClick={() => applySort("name", "asc")}
@@ -339,6 +364,8 @@ export default function DashTable() {
       <Pagination
         currentPage={currentPage}
         totalPages={paginationTokens.length}
+        pageSize={pageSize}
+        onPageSizeChange={handlePageSizeChange}
         onNext={() => {
           if (currentPage + 1 < paginationTokens.length) {
             fetchPaginatedData(currentPage + 1);

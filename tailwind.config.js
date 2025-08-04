@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 import colors from 'tailwindcss/colors';
 
 export default {
@@ -10,7 +10,7 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: colors.blue[700], // or blue[600] for a bit lighter
+          DEFAULT: colors.blue[700],
           50: colors.blue[50],
           100: colors.blue[100],
           200: colors.blue[200],
@@ -24,42 +24,48 @@ export default {
         },
       },
       keyframes: {
-        slideIn: {
-          "0%": { opacity: 0, transform: "tranblueX(100%)" },
-          "100%": { opacity: 1, transform: "tranblueX(0)" },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        fadeLeft: {
+          '0%': { opacity: '0', transform: 'translateX(-100px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        fadeDown: {
+          '0%': { opacity: '0', transform: 'translateY(-100px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         shine: {
-          '0%': { 'background-position': '-200% 0' },
-          '100%': { 'background-position': '200% 0' },
-        },
-        fadeIn: {
-          '0%': { opacity: '0', transform: 'tranblue(-50%, -120%)' },
-          '100%': { opacity: '1', transform: 'tranblue(-50%, -100%)' },
+          '0%': { backgroundPosition: '200% center' },
+          '100%': { backgroundPosition: '-200% center' },
         },
         shake: {
-          '0%, 100%': { transform: 'tranblueX(0)' },
-          '25%': { transform: 'tranblueX(-4px)' },
-          '50%': { transform: 'tranblueX(4px)' },
-          '75%': { transform: 'tranblueX(-4px)' },
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-4px)' },
+          '50%': { transform: 'translateX(4px)' },
+          '75%': { transform: 'translateX(-4px)' },
         },
       },
       animation: {
-        slideIn: "slideIn 0.4s ease-out",
-        shine: "shine 1.5s linear infinite",
-        fadeIn: 'fadeIn 0.18s ease forwards',
+        fadeIn: 'fadeIn 1s ease-out forwards',
+        fadeLeft: 'fadeLeft 0.5s ease-out both',
+        fadeDown: 'fadeDown 0.5s ease-out both',
+        shine: 'shine 2s linear infinite',
         shake: 'shake 0.4s ease-in-out',
       },
     },
   },
-  plugins: [function ({ addBase, theme }) {
-    addBase({
-      ':root': {
-        '--tab-bg-primary': theme('colors.primary.50'),
-        '--tab-bg': theme('colors.primary.100'),
-        '--tab-last-circle-bg' : theme('colors.primary.300'),
-      },
-    });
-  },
-],
+  plugins: [
+    // require("daisyui"),
+    function ({ addBase, theme }) {
+      addBase({
+        ':root': {
+          '--tab-bg-primary': theme('colors.primary.50'),
+          '--tab-bg': theme('colors.primary.100'),
+          '--tab-last-circle-bg': theme('colors.primary.300'),
+        },
+      });
+    },
+  ],
 }
-
