@@ -54,7 +54,9 @@ const SelectionStep = ({ selectedCloud, onNext }) => {
   return (
     <div className="flex flex-col gap-6 items-center justify-center py-8 w-full">
       <div className="w-full max-w-md bg-gradient-to-br from-blue-100 via-white to-purple-100 rounded-3xl shadow-2xl p-10 flex flex-col gap-6 items-center border-2 border-primary-100 hover:border-primary-300 hover:shadow-primary-200 transition-all duration-300 scale-100">
-        <h2 className="text-2xl font-bold mb-4 text-primary-700 text-center drop-shadow">Select Project and Regions</h2>
+        <h2 className="text-2xl font-bold mb-4 text-primary-700 text-center drop-shadow">
+          Select Project and Regions
+        </h2>
         <CustomSelect
           label="Project Name"
           options={projects}

@@ -293,6 +293,9 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
     Math.ceil(tableConfigs.length / 2)
   );
   const rightSkeletons = tableConfigs.slice(Math.ceil(tableConfigs.length / 2));
+  const leftNonEmpty = leftTables.filter(table => table.data && table.data.length > 0);
+  const rightNonEmpty = rightTables.filter(table => table.data && table.data.length > 0);
+  const hideStepper = leftNonEmpty.length > 0 && rightNonEmpty.length > 0;
 
   return (
     <>
@@ -302,6 +305,7 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
         targetRegion={targetRegion}
         onInitiateDr={handleInitiateDr}
         onBack={onBack}
+        hideStepper={hideStepper}
       />
       {loading ? (
         <div className="flex gap-8 mt-8">
