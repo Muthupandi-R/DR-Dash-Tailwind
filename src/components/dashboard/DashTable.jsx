@@ -10,6 +10,7 @@ import SkeletonTable from "../Loaders/SkeletonTable";
 import TableTabs from "./tabs/TableTabs";
 import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
+import NoDataCard from "./NoDataCard";
 import { RiExpandUpDownLine } from "react-icons/ri";
 import ContextApi from "../../context/ContextApi";
 import { getIcon } from "../../utils/iconMap";
@@ -38,7 +39,7 @@ export default function DashTable() {
 
   useEffect(() => {
     statusUpdate(filteredData, setFilteredData, socketData);
-  }, [socketData]); 
+  }, [socketData]);
 
   // Handle click outside to close sort menu
   useEffect(() => {
@@ -49,11 +50,11 @@ export default function DashTable() {
     };
 
     if (sortMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [sortMenuOpen]);
 
@@ -65,7 +66,7 @@ export default function DashTable() {
   const handleSelectAllChange = (e) => {
     if (e.target.checked) {
       const allIds = filteredData.map((item) => item.id);
-      setSelectedIds(allIds); 
+      setSelectedIds(allIds);
     } else {
       setSelectedIds([]);
     }
@@ -88,21 +89,21 @@ export default function DashTable() {
   const applySort = (field, order) => {
     setSortField(order ? field : null);
     setSortOrder(order);
-  
+
     if (!filteredData?.length) return;
-  
+
     const sorted = [...filteredData].sort((a, b) => {
       const aValue = a[field] || "";
       const bValue = b[field] || "";
-  
+
       if (order === "asc") return aValue.localeCompare(bValue);
       if (order === "desc") return bValue.localeCompare(aValue);
       return 0;
     });
-  
+
     // update the filteredData.data with sorted version
     setFilteredData(sorted);
-  
+
     setSortMenuOpen(false);
     if (!order) {
       setSortField(null);
@@ -110,9 +111,8 @@ export default function DashTable() {
       return fetchPaginatedData(0);
     }
   };
-  
-  
-  const ServiceIcon = ({ cloud, serviceType}) => {
+
+  const ServiceIcon = ({ cloud, serviceType }) => {
     const iconSrc = getIcon(cloud, serviceType);
     return iconSrc ? (
       <img src={iconSrc} alt={`${cloud}-${serviceType}`} className="w-4 h-4" />
@@ -121,25 +121,29 @@ export default function DashTable() {
     );
   };
   const fetchPaginatedData = async (pageNumber) => {
-
     setTableLoading(true);
     try {
       const tokenToUse = paginationTokens[pageNumber] || "";
-      const data = await fetchDataDashboard(selectedCloud, selectedFilters, searchFilter, tokenToUse, pageSize);
-  
+      const data = await fetchDataDashboard(
+        selectedCloud,
+        selectedFilters,
+        searchFilter,
+        tokenToUse,
+        pageSize
+      );
+
       setFilteredData(data?.data || []);
       setFacets(data?.facets || []);
-  
+
       const newSkipToken = data?.$skipToken;
 
-    if (newSkipToken
-    ) {
-      setPaginationTokens((prev) => {
-        if (!prev.includes(newSkipToken)) {
-          return [...prev, newSkipToken];
-        }
-        return prev; // don't update if token already exists
-      });
+      if (newSkipToken) {
+        setPaginationTokens((prev) => {
+          if (!prev.includes(newSkipToken)) {
+            return [...prev, newSkipToken];
+          }
+          return prev; // don't update if token already exists
+        });
       }
       setCurrentPage(pageNumber);
     } catch (err) {
@@ -148,7 +152,7 @@ export default function DashTable() {
       setTableLoading(false);
     }
   };
-  
+
   return (
     <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1 ">
       <div className="mt-2 flex justify-between items-center">
@@ -223,7 +227,10 @@ export default function DashTable() {
                       </div>
 
                       {sortMenuOpen && (
-                        <div ref={sortMenuRef} className="absolute top-12 right-0 z-10 w-32 bg-white border rounded shadow-lg text-xs">
+                        <div
+                          ref={sortMenuRef}
+                          className="absolute top-12 right-0 z-10 w-32 bg-white border rounded shadow-lg text-xs"
+                        >
                           <button
                             className="w-full px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
                             onClick={() => applySort("name", "asc")}
@@ -237,8 +244,10 @@ export default function DashTable() {
                             <span className="text-gray-700">↓ Desc</span>
                           </button>
                           <button
-                            className={`w-full px-3 py-2 hover:bg-gray-100 flex items-center gap-2 ${!sortField ? "opacity-50 cursor-not-allowed" : ""}`}
-                            disabled = { !sortField}
+                            className={`w-full px-3 py-2 hover:bg-gray-100 flex items-center gap-2 ${
+                              !sortField ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
+                            disabled={!sortField}
                             onClick={() => applySort("name", null)}
                           >
                             <span className="text-gray-700">✕ Remove</span>
@@ -285,75 +294,86 @@ export default function DashTable() {
                   </tr>
                 </thead>
                 <tbody className="bg-primary-50 divide-y divide-gray-200">
-                  {filteredData?.map((data) => (
-                    <tr
-                      key={data.id}
-                      className="hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      <td className="p-2">
-                        {/* <input
+                  {filteredData && filteredData.length > 0 ? (
+                    filteredData?.map((data) => (
+                      <tr
+                        key={data.id}
+                        className="hover:bg-gray-50 transition-colors duration-150"
+                      >
+                        <td className="p-2">
+                          {/* <input
                         type="checkbox"
                         checked={selectedIds.includes(data.id)}
                         onChange={(e) => handleRowCheckboxChange(e, data.id)}
                       /> */}
-                        <div className="inline-flex items-center">
-                          <label className="flex items-center cursor-pointer relative">
-                            <input
-                              type="checkbox"
-                              checked={selectedIds.includes(data.id)}
-                              className="peer h-3 w-3 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary-500 checked:border-primary-500"
-                              onChange={(e) =>
-                                handleRowCheckboxChange(e, data.id)
-                              }
+                          <div className="inline-flex items-center">
+                            <label className="flex items-center cursor-pointer relative">
+                              <input
+                                type="checkbox"
+                                checked={selectedIds.includes(data.id)}
+                                className="peer h-3 w-3 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary-500 checked:border-primary-500"
+                                onChange={(e) =>
+                                  handleRowCheckboxChange(e, data.id)
+                                }
+                              />
+                              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-3.5 w-3.5"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                  stroke="currentColor"
+                                  strokeWidth="1"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clipRule="evenodd"
+                                  ></path>
+                                </svg>
+                              </span>
+                            </label>
+                          </div>
+                        </td>
+                        <td className="p-1 whitespace-nowrap text-xs text-gray-900">
+                          <div className="flex items-center gap-2">
+                            <ServiceIcon
+                              cloud={selectedCloud}
+                              serviceType={data?.type}
                             />
-                            <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-3.5 w-3.5"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                stroke="currentColor"
-                                strokeWidth="1"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                ></path>
-                              </svg>
-                            </span>
-                          </label>
-                        </div>
-                      </td>
-                      <td className="p-1 whitespace-nowrap text-xs text-gray-900">
-                        <div className="flex items-center gap-2">
-                          <ServiceIcon cloud={selectedCloud} serviceType={data?.type} />
-                          <span>{data?.name}</span>
-                        </div>
-                      </td>
-                      <td className="p-2 whitespace-nowrap text-xs text-gray-900">
-                        {getOrderStatus(data?.state)}
-                      </td>
-                      <td className="p-1 whitespace-nowrap text-xs text-gray-900">
-                        {getResourceTypeLabel(data?.type, data?.kind)}
-                      </td>
-                      {/* <td className="p-1 whitespace-nowrap text-xs text-gray-900">
+                            <span>{data?.name}</span>
+                          </div>
+                        </td>
+                        <td className="p-2 whitespace-nowrap text-xs text-gray-900">
+                          {getOrderStatus(data?.state)}
+                        </td>
+                        <td className="p-1 whitespace-nowrap text-xs text-gray-900">
+                          {getResourceTypeLabel(data?.type, data?.kind)}
+                        </td>
+                        {/* <td className="p-1 whitespace-nowrap text-xs text-gray-900">
                         {data?.projectTags?.Name || "-"}
                       </td> */}
-                      <td className="p-1 text-xs text-gray-900">
-                        {data?.resourceTags?.Name || "-"}
-                      </td>
-                      <td className="p-1 text-xs text-gray-900">
-                        {data?.projectName || "-"}
-                      </td>
-                      <td className="text-xs text-gray-800">
-                        <div className="flex items-center gap-2">
-                          <FiMapPin className="text-blue-600" />
-                          <span>{data?.location || "Unknown"}</span>
-                        </div>
+                        <td className="p-1 text-xs text-gray-900">
+                          {data?.resourceTags?.Name || "-"}
+                        </td>
+                        <td className="p-1 text-xs text-gray-900">
+                          {data?.projectName || "-"}
+                        </td>
+                        <td className="text-xs text-gray-800">
+                          <div className="flex items-center gap-2">
+                            <FiMapPin className="text-blue-600" />
+                            <span>{data?.location || "Unknown"}</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} className="text-center py-4">
+                        <NoDataCard />
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -361,22 +381,22 @@ export default function DashTable() {
         )}
       </div>
       <div className="flex justify-end mt-2">
-      <Pagination
-        currentPage={currentPage}
-        totalPages={paginationTokens.length}
-        pageSize={pageSize}
-        onPageSizeChange={handlePageSizeChange}
-        onNext={() => {
-          if (currentPage + 1 < paginationTokens.length) {
-            fetchPaginatedData(currentPage + 1);
-          }
-        }}
-        onPrev={() =>  {
-          if (currentPage > 0) {
-            fetchPaginatedData(currentPage - 1);
-          }
-        }}
-      />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={paginationTokens.length}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+          onNext={() => {
+            if (currentPage + 1 < paginationTokens.length) {
+              fetchPaginatedData(currentPage + 1);
+            }
+          }}
+          onPrev={() => {
+            if (currentPage > 0) {
+              fetchPaginatedData(currentPage - 1);
+            }
+          }}
+        />
       </div>
     </div>
   );
