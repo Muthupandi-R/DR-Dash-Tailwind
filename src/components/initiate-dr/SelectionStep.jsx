@@ -53,36 +53,45 @@ const SelectionStep = ({ selectedCloud, onNext }) => {
 
   return (
     <div className="flex flex-col gap-6 items-center justify-center py-8 w-full">
-      <div className="w-full max-w-md bg-gradient-to-br from-blue-100 via-white to-purple-100 rounded-3xl shadow-2xl p-10 flex flex-col gap-6 items-center border-2 border-primary-100 hover:border-primary-300 hover:shadow-primary-200 transition-all duration-300 scale-100">
-        <h2 className="text-2xl font-bold mb-4 text-primary-700 text-center drop-shadow">
-          Select Project and Regions
-        </h2>
-        <CustomSelect
-          label="Project Name"
-          options={projects}
-          value={projectName}
-          onChange={setProjectName}
-          disabled={loading}
-        />
-        <CustomSelect
-          label="Source Region"
-          options={regionOptions}
-          value={sourceRegion}
-          onChange={setSourceRegion}
-        />
-        <CustomSelect
-          label="Target Region"
-          options={regionOptions}
-          value={targetRegion}
-          onChange={setTargetRegion}
-        />
-        <button
-          className="mt-4 px-6 py-2 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 text-white rounded-full shadow-lg hover:scale-105 hover:bg-primary-700 transition-all duration-200 disabled:opacity-50 w-full border-0 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2"
-          disabled={!projectName || !sourceRegion || !targetRegion}
-          onClick={handleNext}
-        >
-          Next
-        </button>
+      {/* Animated border wrapper */}
+      <div className="animate-rotate-border max-w-sm rounded-3xl bg-conic/[from_var(--border-angle)] from-primary-50 via-primary-500 to-primary-50 from-80% via-90% to-100% p-0.5">
+        {/* Inner card with gradient background */}
+        <div className="w-full bg-gradient-to-br from-blue-100 via-white to-purple-100 rounded-3xl shadow-2xl p-10 flex flex-col gap-6 items-center border border-primary-100 hover:border-primary-300 hover:shadow-primary-200 transition-all duration-300">
+          {/* Heading */}
+          <h2 className="text-2xl font-bold mb-4 text-primary-700 text-center drop-shadow">
+            Select Project and Regions
+          </h2>
+
+          {/* Custom select components */}
+          <CustomSelect
+            label="Project Name"
+            options={projects}
+            value={projectName}
+            onChange={setProjectName}
+            disabled={loading}
+          />
+          <CustomSelect
+            label="Source Region"
+            options={regionOptions}
+            value={sourceRegion}
+            onChange={setSourceRegion}
+          />
+          <CustomSelect
+            label="Target Region"
+            options={regionOptions}
+            value={targetRegion}
+            onChange={setTargetRegion}
+          />
+
+          {/* Submit button */}
+          <button
+            className="mt-4 px-6 py-2 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 text-white rounded-full shadow-lg hover:scale-105 hover:bg-primary-700 transition-all duration-200 disabled:opacity-50 w-full focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2"
+            disabled={!projectName || !sourceRegion || !targetRegion}
+            onClick={handleNext}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

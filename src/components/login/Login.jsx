@@ -57,7 +57,7 @@ export default function Login() {
       <button
         ref={cardRef}
         onClick={onClick}
-        className={`group relative flex flex-col items-center justify-center w-55 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm card-entrance`}
+        className={`group relative flex flex-col items-center justify-center w-40 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm card-entrance`}
         style={{ 
           boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)"
         }}
@@ -111,7 +111,7 @@ export default function Login() {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-primary-800 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center animate-rotate-border bg-conic/[from_var(--border-angle)] from-primary-400 via-primary-800 to-primary-400 relative overflow-hidden">
       {/* Earth GIF background, left side */}
       <img
         src={earthGif}
