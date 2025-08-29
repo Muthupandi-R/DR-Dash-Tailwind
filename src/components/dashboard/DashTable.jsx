@@ -13,7 +13,7 @@ import Pagination from "./Pagination";
 import NoDataCard from "./NoDataCard";
 import { RiExpandUpDownLine } from "react-icons/ri";
 import ContextApi from "../../context/ContextApi";
-import { getIcon } from "../../utils/iconMap";
+import ServiceIcon from "../service-icon/ServiceIcon";
 export default function DashTable() {
   const [filteredData, setFilteredData] = useState([]);
   const [tableLoading, setTableLoading] = useState(false);
@@ -112,14 +112,6 @@ export default function DashTable() {
     }
   };
 
-  const ServiceIcon = ({ cloud, serviceType }) => {
-    const iconSrc = getIcon(cloud, serviceType);
-    return iconSrc ? (
-      <img src={iconSrc} alt={`${cloud}-${serviceType}`} className="w-4 h-4" />
-    ) : (
-      <div className="w-4 h-4 rounded bg-gray-200 animate-pulse" />
-    );
-  };
   const fetchPaginatedData = async (pageNumber) => {
     setTableLoading(true);
     try {
