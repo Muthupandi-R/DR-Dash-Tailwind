@@ -25,7 +25,7 @@ export default function Sidebar({ expanded, setExpanded, children }) {
                         </div>
                     </div>
                     <SidebarContext.Provider value={{ expanded }}>
-                        <ul className="flex-1 px-3 bg-conic/[from_var(--border-angle)] from-primary-400 via-primary-800 to-primary-400 animate-rotate-border">{children}</ul>
+                        <ul className="flex-1 px-3">{children}</ul>
                     </SidebarContext.Provider>
                 </nav>
             </aside>

@@ -24,6 +24,7 @@ const iconMap = {
     eks: AwsKubernetes,
     lambda: AwsServerlessComputing,
     elasticbeanstalk: AwsServerlessWorkflow,
+    cluster: AwsKubernetes,
   },
   azure: {
     virtualmachine: AzureCompute,
@@ -31,6 +32,7 @@ const iconMap = {
     aks: AzureKubernetes,
     functionapp: AzureServerlessComputing,
     webapp: AzureServerlessWorkflow,
+    cluster: AzureKubernetes,
   },
   gcp: {
     computeengine: GcpCompute,
