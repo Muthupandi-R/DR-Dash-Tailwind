@@ -1,7 +1,7 @@
 
 const NoDataCard = () => {
   return (
-    <div className="grid gap-4 w-100">
+    <div className="grid gap-4">
       <svg
         className="mx-auto"
         xmlns="http://www.w3.org/2000/svg"

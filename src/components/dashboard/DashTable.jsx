@@ -5,7 +5,6 @@ import {
   getResourceTypeLabel,
   statusUpdate,
 } from "../../services/apiService";
-import { FiMapPin } from "react-icons/fi";
 import SkeletonTable from "../Loaders/SkeletonTable";
 import TableTabs from "./tabs/TableTabs";
 import SearchBar from "./SearchBar";
@@ -14,6 +13,7 @@ import NoDataCard from "./NoDataCard";
 import { RiExpandUpDownLine } from "react-icons/ri";
 import ContextApi from "../../context/ContextApi";
 import ServiceIcon from "../service-icon/ServiceIcon";
+import { getStatusColor } from "../../services/apiService";
 export default function DashTable() {
   const [filteredData, setFilteredData] = useState([]);
   const [tableLoading, setTableLoading] = useState(false);
@@ -146,21 +146,21 @@ export default function DashTable() {
   };
 
   return (
-    <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-sm flex-1 ">
+    <div className="bg-gradientPrimary px-4 pt-3 pb-4 rounded-lg flex-1 ">
       <div className="mt-2 flex justify-between items-center">
         <TableTabs facets={facets} setSelectedFilters={setSelectedFilters} />
         <SearchBar setSearchFilter={setSearchFilter} />
       </div>
-      <div className="border border-gray-200 rounded-sm mt-1">
+      <div className="border border-gray-200 rounded-lg mt-1 bg-white/80 shadow-lg">
         {tableLoading ? (
           <SkeletonTable rows={8} columns={5} />
         ) : (
           <>
-            <div className="max-h-[50vh] overflow-y-auto scrollbar-thin overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+            <div className="max-h-[50vh] overflow-y-auto scrollbar-thin overflow-x-auto rounded-lg">
+              <table>
                 <thead className="bg-primary-200">
-                  <tr>
-                    <th className="p-2">
+                  <tr className="bg-gradient-to-r from-primary-50 via-indigo-50 to-purple-50 border-b border-gray-200/60">
+                    <th>
                       <div className="inline-flex items-center">
                         <label className="flex items-center cursor-pointer relative">
                           <input
@@ -206,13 +206,13 @@ export default function DashTable() {
                     </th>
                     <th
                       scope="col"
-                      className="relative p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
+                      className="relative p-2 text-left  uppercase tracking-wider"
                     >
                       <div className="flex items-center gap-1">
                         Resource Name
                         <button
                           onClick={() => setSortMenuOpen((prev) => !prev)}
-                          className="p-1 hover:bg-gray-200 rounded"
+                          className="p-1 hover:bg-gray-200 rounded cursor-pointer"
                         >
                           <RiExpandUpDownLine className="text-xl" />
                         </button>
@@ -221,7 +221,7 @@ export default function DashTable() {
                       {sortMenuOpen && (
                         <div
                           ref={sortMenuRef}
-                          className="absolute top-12 right-0 z-10 w-32 bg-white border rounded shadow-lg text-xs"
+                          className="absolute top-10 right-14 z-10 w-32 bg-white border rounded shadow-lg text-xs"
                         >
                           <button
                             className="w-full px-3 py-2 hover:bg-gray-100 flex items-center gap-2"
@@ -247,57 +247,44 @@ export default function DashTable() {
                         </div>
                       )}
                     </th>
-                    <th
-                      scope="col"
-                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
-                    >
-                      State
+                    <th>
+                      <div className="flex items-center gap-2">
+                        State
+                      </div>
                     </th>
-                    <th
-                      scope="col"
-                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
-                    >
-                      Type
+                    <th>
+                      <div className="flex items-center gap-2">
+                        Type
+                      </div>
                     </th>
-                    {/* <th
-                      scope="col"
-                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
-                    >
-                      Resource Group
-                    </th> */}
-                    <th
-                      scope="col"
-                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
-                    >
+
+                    <th>
+                      <div className="flex items-center gap-2">
                       Resource Tag
+                      </div>
                     </th>
-                    <th
-                      scope="col"
-                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
-                    >
-                      Project Name
+                    <th>
+                      <div className="flex items-center gap-2">
+                       Project Name
+                      </div>
                     </th>
-                    <th
-                      scope="col"
-                      className="p-2 text-left text-xs font-medium text-primary-700 uppercase tracking-wider"
-                    >
-                      Location
+                    <th>
+                      <div className="flex items-center gap-2">
+                        Location
+                      </div>
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-primary-50 divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200/40">
                   {filteredData && filteredData.length > 0 ? (
-                    filteredData?.map((data) => (
+                    filteredData?.map((data, idx) => (
                       <tr
                         key={data.id}
-                        className="hover:bg-gray-50 transition-colors duration-150"
+                        className={`${
+                          idx % 2 === 1 ? "bg-primary-50/40" : "bg-white"
+                        }`}
                       >
-                        <td className="p-2">
-                          {/* <input
-                        type="checkbox"
-                        checked={selectedIds.includes(data.id)}
-                        onChange={(e) => handleRowCheckboxChange(e, data.id)}
-                      /> */}
+                        <td>
                           <div className="inline-flex items-center">
                             <label className="flex items-center cursor-pointer relative">
                               <input
@@ -327,34 +314,61 @@ export default function DashTable() {
                             </label>
                           </div>
                         </td>
-                        <td className="p-1 whitespace-nowrap text-xs text-gray-900">
+                        <td className="whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <ServiceIcon
-                              cloud={selectedCloud}
-                              serviceType={data?.type}
-                            />
-                            <span>{data?.name}</span>
+                            <div className="relative">
+                              <ServiceIcon
+                                cloud={selectedCloud}
+                                serviceType={data?.type}
+                              />
+                              <div
+                                className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow-sm 
+                    ${getStatusColor(data?.state)}`}
+                              ></div>
+                            </div>
+                            <span className="font-semibold hover:text-primary-600">
+                              {data?.name}
+                            </span>
                           </div>
                         </td>
-                        <td className="p-2 whitespace-nowrap text-xs text-gray-900">
+                        <td className=" whitespace-nowrap">
                           {getOrderStatus(data?.state)}
                         </td>
-                        <td className="p-1 whitespace-nowrap text-xs text-gray-900">
+                        <td className="whitespace-nowrap font-medium">
                           {getResourceTypeLabel(data?.type, data?.kind)}
                         </td>
-                        {/* <td className="p-1 whitespace-nowrap text-xs text-gray-900">
-                        {data?.projectTags?.Name || "-"}
-                      </td> */}
-                        <td className="p-1 text-xs text-gray-900">
+                        <td className="whitespace-nowrap font-medium">
                           {data?.resourceTags?.Name || "-"}
                         </td>
-                        <td className="p-1 text-xs text-gray-900">
+                        <td className="whitespace-nowrap font-medium">
                           {data?.projectName || "-"}
                         </td>
-                        <td className="text-xs text-gray-800">
+                        <td className="whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <FiMapPin className="text-blue-600" />
-                            <span>{data?.location || "Unknown"}</span>
+                            <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center">
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                              </svg>
+                            </div>
+                            <span className="text-xs text-gray-900 font-medium">
+                              {data?.location || "Unknown"}
+                            </span>
                           </div>
                         </td>
                       </tr>

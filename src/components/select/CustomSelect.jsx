@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiChevronDown } from "react-icons/fi";
+import { getLabel } from "../../services/apiService";
 
 const CustomSelect = ({
   label,
@@ -7,6 +8,7 @@ const CustomSelect = ({
   value,
   onChange,
   disabled = false,
+  selectedCloud
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState("bottom");
@@ -138,13 +140,13 @@ const CustomSelect = ({
                     onChange(option.value);
                     setIsDropdownOpen(false);
                   }}
-                  disabled={label !== "Project Name" && option.value !== value}
+                  disabled={label !== getLabel(selectedCloud) && option.value !== value}
                   className={`w-full px-3 py-2 text-sm text-left transition-colors duration-150 ${
                     option.value === value
                       ? "bg-primary-100 text-primary-700 font-medium"
                       : "text-gray-700 hover:bg-primary-50"
                   } ${
-                    label !== "Project Name" && option.value !== value
+                    label !== getLabel(selectedCloud) && option.value !== value
                       ? "opacity-50 cursor-not-allowed"
                       : ""
                   }`}

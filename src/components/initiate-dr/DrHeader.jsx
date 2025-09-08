@@ -1,6 +1,6 @@
 import React from "react";
 import { FaArrowLeft } from "react-icons/fa";
-
+import { getLabel } from "../../services/apiService";
 
 const stepLabels = [
   "Capacity",
@@ -9,7 +9,7 @@ const stepLabels = [
   "Verified",
 ];
 
-const DrHeader = ({ projectName, sourceRegion, targetRegion, onBack, onInitiateDr, hideStepper }) => {
+const DrHeader = ({ projectName, sourceRegion, targetRegion, onBack, onInitiateDr, hideStepper, selectedCloud }) => {
   const step = 2; // static for now, can be made dynamic if needed
   return (
     <>
@@ -25,7 +25,7 @@ const DrHeader = ({ projectName, sourceRegion, targetRegion, onBack, onInitiateD
         )}
           <div className="flex flex-wrap gap-2">
             <span className="flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-blue-100">
-              <span className="font-semibold">Project:</span> {projectName}
+              <span className="font-semibold">{getLabel(selectedCloud)}:</span> {projectName}
             </span>
             <span className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-green-100">
               <span className="font-semibold">Source:</span> {sourceRegion}

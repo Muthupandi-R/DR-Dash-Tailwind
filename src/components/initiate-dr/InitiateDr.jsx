@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import TableData from "./TableData";
 import SelectionStep from "./SelectionStep";
-import DrHeader from "./DrHeader";
 import ContextApi from "../../context/ContextApi";
 import project1 from "../../images/project.png";
 import './tabs.css'
@@ -76,7 +75,7 @@ const InitiateDr = () => {
   };
 console.log(tabs, "tabs")
   return (
-    <div className="w-full h-full p-1 px-0 overflow-y-auto mt-10">
+    <div className="w-full h-full p-1 px-0 overflow-y-auto mt-10 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
       {/* Top Tabs */}
       <div className="overflow-x-auto scrollbar-hide">
         <ul className="tabs">

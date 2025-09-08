@@ -40,7 +40,7 @@ export default function Sidebar({ expanded, setExpanded, children }) {
                     rounded-full bg-gradient-to-br from-primary-200 via-primary-200 to-primary-100
                     shadow-md border border-primary-300
                     hover:from-primary-300 hover:to-primary-200
-                    transition-all
+                    transition-all cursor-pointer
                 `}
                 aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
                 style={{ marginLeft: '-16px' }} // overlap the edge a bit for a floating look

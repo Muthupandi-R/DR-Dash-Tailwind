@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CustomSelect from "../select/CustomSelect";
 import { fetchProjects } from "../../services/apiService";
-
+import { getLabel } from "../../services/apiService";
 const REGION_OPTIONS = {
   azure: ["East US", "Central US", "Southeast Asia"],
   aws: ["us-east-2", "us-west-1", "ap-south-1"],
@@ -59,16 +59,17 @@ const SelectionStep = ({ selectedCloud, onNext }) => {
         <div className="w-full bg-gradient-to-br from-blue-100 via-white to-purple-100 rounded-3xl shadow-2xl p-10 flex flex-col gap-6 items-center border border-primary-100 hover:border-primary-300 hover:shadow-primary-200 transition-all duration-300">
           {/* Heading */}
           <h2 className="text-2xl font-bold mb-4 text-primary-700 text-center drop-shadow">
-            Select Project and Regions
+           {`Select ${getLabel(selectedCloud)} and Regions`}
           </h2>
 
           {/* Custom select components */}
           <CustomSelect
-            label="Project Name"
+            label={getLabel(selectedCloud)}
             options={projects}
             value={projectName}
             onChange={setProjectName}
             disabled={loading}
+            selectedCloud={selectedCloud}
           />
           <CustomSelect
             label="Source Region"
