@@ -16,6 +16,7 @@ import GcpDb from '../assets/Icons/gcp/sql.png';
 import GcpKubernetes from '../assets/Icons/gcp/gke.png';
 import GcpServerlessComputing from '../assets/Icons/gcp/cloudfunction.png';
 import GcpServerlessWorkflow from '../assets/Icons/gcp/workflow.png';
+import Namespace from '../assets/Icons/namespace.png'
 
 const iconMap = {
   aws: {
@@ -24,6 +25,8 @@ const iconMap = {
     eks: AwsKubernetes,
     lambda: AwsServerlessComputing,
     elasticbeanstalk: AwsServerlessWorkflow,
+    cluster: AwsKubernetes,
+    namespace: Namespace
   },
   azure: {
     virtualmachine: AzureCompute,
@@ -31,6 +34,8 @@ const iconMap = {
     aks: AzureKubernetes,
     functionapp: AzureServerlessComputing,
     webapp: AzureServerlessWorkflow,
+    cluster: AzureKubernetes,
+    namespace: Namespace
   },
   gcp: {
     computeengine: GcpCompute,
@@ -38,6 +43,8 @@ const iconMap = {
     gke: GcpKubernetes,
     cloudfunction: GcpServerlessComputing,
     workflow: GcpServerlessWorkflow,
+    cluster: GcpKubernetes,
+    namespace: Namespace
   },
 };
 

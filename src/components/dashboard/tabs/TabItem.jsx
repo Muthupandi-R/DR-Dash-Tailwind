@@ -98,7 +98,7 @@ const TabItem = ({ expression, data, activeTab, setActiveTab, setSelectedFilters
         </span>
 
         <FaChevronDown
-          className={`text-xs transition-transform ${
+          className={`text-xs text-primary-900 transition-transform ${
             isDropdownOpen ? "rotate-180" : ""
           }`}
         />
@@ -111,28 +111,28 @@ const TabItem = ({ expression, data, activeTab, setActiveTab, setSelectedFilters
       </div>
 
       {isActive && isDropdownOpen && (
-        <div className="absolute mt-2 bg-white shadow-lg rounded-md w-56 z-10 p-2">
+        <div className="absolute mt-2 bg-primary-50 shadow-lg rounded-md w-56 z-10 p-2">
           {/* Filter + selected values display */}
           <div className="flex items-center gap-2 mb-2 border rounded px-2 py-1">
             <FaFilter className="text-gray-500 text-sm" />
             <input
               type="text"
-              className="w-full text-sm outline-none"
+              className="w-full text-sm outline-none bg-primary-50 text-black"
               placeholder="Filter options..."
-              value={selectedItems.join(", ")}
+              value={selectedItems?.join(", ") || filterInput}
               onChange={(e) => setFilterInput(e.target.value)}
             />
           </div>
 
           {/* Options */}
-          <div className="max-h-40 overflow-y-auto text-sm">
+          <div className="max-h-40 overflow-y-auto text-xs">
             {filteredOptions.length === 0 ? (
               <div className="px-2 py-1 text-gray-500">No match</div>
             ) : (
               filteredOptions.map((opt, idx) => (
                 <label
                   key={idx}
-                  className="flex items-center px-2 py-1 hover:bg-gray-100 cursor-pointer gap-2"
+                  className="flex items-center px-2 py-1 hover:bg-primary-100 cursor-pointer gap-2"
                 >
                   <input
                     type="checkbox"

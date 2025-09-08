@@ -292,7 +292,10 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
     0,
     Math.ceil(tableConfigs.length / 2)
   );
-  const rightSkeletons = tableConfigs.slice(Math.ceil(tableConfigs.length / 2));
+  const rightSkeletons = tableConfigs.slice(0, Math.ceil(tableConfigs.length / 2));
+  const leftNonEmpty = leftTables.filter(table => table.data && table.data.length > 0);
+  const rightNonEmpty = rightTables.filter(table => table.data && table.data.length > 0);
+  const hideStepper = leftNonEmpty.length > 0 && rightNonEmpty.length > 0;
 
   return (
     <>
@@ -302,6 +305,8 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
         targetRegion={targetRegion}
         onInitiateDr={handleInitiateDr}
         onBack={onBack}
+        hideStepper={hideStepper}
+        selectedCloud={selectedCloud}
       />
       {loading ? (
         <div className="flex gap-8 mt-8">

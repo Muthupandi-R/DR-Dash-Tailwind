@@ -51,15 +51,41 @@ export function getOrderStatus(status) {
       className={`capitalize py-1 px-2 rounded-md text-xs inline-flex items-center gap-2 ${textColor} ${bgColor}`}
     >
       <span
-        className="w-2 h-2 rounded-[2px] text-xs"
+        className="w-2 h-2 rounded-md text-xs"
         style={{ backgroundColor: dotColor }}
       ></span>
-      <span className="text-xs">{status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : ''}</span>
+      <span className="text-xs">
+        {status
+          ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+          : ""}
+      </span>
     </span>
   );
 }
 
-export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, searchFilter = "", skipToken = "") {
+export const getStatusColor = (state) => {
+  if (!state) return "bg-gray-400"; // default if no state
+
+  const normalized = state.toLowerCase();
+
+  const greenStates = ["running", "active", "runnable", "available"];
+  const redStates = ["stopped"];
+  const yellowStates = ["pending"];
+
+  if (greenStates.includes(normalized)) return "bg-green-500";
+  if (redStates.includes(normalized)) return "bg-red-500";
+  if (yellowStates.includes(normalized)) return "bg-yellow-500";
+
+  return "bg-gray-400"; // fallback
+};
+
+export async function fetchDataDashboard(
+  selectedCloud,
+  selectedFilters = {},
+  searchFilter = "",
+  skipToken = "",
+  pageSize = 5
+) {
   try {
     // const selconst { selectedCloud } = useContext(ContextApi);
 
@@ -73,13 +99,15 @@ export async function fetchDataDashboard(selectedCloud,  selectedFilters = {}, s
     }
 
     if (searchFilter.trim() !== "") {
-      queryParams.push(`searchFilter=${encodeURIComponent(searchFilter.trim())}`);
+      queryParams.push(
+        `searchFilter=${encodeURIComponent(searchFilter.trim())}`
+      );
     }
     if (skipToken) {
       queryParams.push(`skipToken=${encodeURIComponent(skipToken)}`);
     }
 
-    queryParams.push("top=5");
+    queryParams.push(`top=${pageSize}`);
 
     apiUrl += queryParams.join("&");
     const response = await axios.get(apiUrl);
@@ -145,9 +173,9 @@ const isFunctionApp = (kind) => {
 
 export const statusUpdate = (filteredData, setFilteredData, socketData) => {
   console.log(filteredData, "filteredData");
-  
-  if(filteredData.length === 0) return;
-    const updatedFiltered = filteredData?.map((item) => {
+
+  if (filteredData.length === 0) return;
+  const updatedFiltered = filteredData?.map((item) => {
     const isMatchingId =
       item.id?.toLowerCase() === socketData?.topic?.toLowerCase();
     const isMatchingName = item.name === socketData?.data?.name;
@@ -155,8 +183,9 @@ export const statusUpdate = (filteredData, setFilteredData, socketData) => {
     if (isMatchingId && isMatchingName) {
       console.log(`Updating status for item with ID: ${item.id}`);
 
-      const action = socketData?.data?.appEventTypeDetail?.action?.toLowerCase();
-      
+      const action =
+        socketData?.data?.appEventTypeDetail?.action?.toLowerCase();
+
       const updateState = action === "started" ? "running" : action;
 
       return {
@@ -191,20 +220,151 @@ export async function fetchInitiateDrResources(projectName, selectedCloud) {
     }/cloud/${selectedCloud}/initiate-dr/resources?projectName=${projectName}`;
     const response = await axios.get(apiUrl);
     return response?.data?.data?.["active-nothing-resources"] || [];
-   
-    
   } catch (error) {
     console.error("Failed to fetch Initiate DR Resources:", error);
     throw error;
   }
 }
 
+export async function fetchKubernetesResource(selectedCloud) {
+  try {
+    let apiUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/container/${selectedCloud}/clusters`;
+    const response = await axios.get(apiUrl);
+    return response?.data?.data?.data;
+  } catch (error) {
+    console.error("Failed to fetch kubernetes resources:", error);
+    throw error;
+  }
+}
+
+export async function fetchNamespaceData(cluster, selectedCloud) {
+  try {
+    let apiUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/container/${selectedCloud}/namespaces`;
+
+    // Build query params based on cloud provider
+    const params = { clusterId: cluster?.id };
+
+    if (selectedCloud === "aws" || selectedCloud === "gcp") {
+      params.clusterId = cluster?.name;
+      params.region = cluster?.location;
+    }
+
+    if (selectedCloud === "gcp") {
+      params.projectId = cluster?.cloudAccountId;
+    }
+
+    const response = await axios.get(apiUrl, { params });
+    return response?.data?.data;
+  } catch (error) {
+    console.error("Failed to fetch kubernetes resources:", error);
+    throw error;
+  }
+}
+
+export async function fetchPodsData(ns, cluster, selectedCloud) {
+  try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const apiUrlPod = `${baseUrl}/container/${selectedCloud}/pods`;
+    const apiUrlCpuMem = `${baseUrl}/container/${selectedCloud}/pods-metrics`;
+
+    // Build query params for Pods API
+    const podParams = {
+      clusterId: cluster?.id,
+      namespaces: ns?.name, // plural for pods API
+    };
+
+    if (selectedCloud === "aws" || selectedCloud === "gcp") {
+      podParams.clusterId = cluster?.name;
+      podParams.region = cluster?.location;
+    }
+
+    if (selectedCloud === "gcp") {
+      podParams.projectId = cluster?.cloudAccountId;
+    }
+
+    // ---- Fetch Pods ----
+    const podsResponse = await axios.get(apiUrlPod, { params: podParams });
+    let pods = podsResponse?.data?.data?.podsListByNamespaces[0]?.pods || [];
+    if (pods.length === 0) return [];
+
+    // Build query params for Metrics API (difference: namespace, not namespaces)
+    const metricsParams = { ...podParams };
+    metricsParams.namespace = ns?.name; // singular for metrics API
+    delete metricsParams.namespaces; // remove plural key
+
+    // ---- Fetch CPU/Memory ----
+    const cpuMemResponse = await axios.get(apiUrlCpuMem, {
+      params: metricsParams,
+    });
+    const cpuMemList = cpuMemResponse?.data?.data || [];
+
+    // ---- Merge metrics with pods ----
+    pods = pods.map((pod) => {
+      const matchingMetric = cpuMemList.find(
+        (metric) => metric?.podName === pod?.name
+      );
+      return {
+        ...pod,
+        cpuUsage: matchingMetric?.cpuUsage || null,
+        cpuRequest: matchingMetric?.cpuRequest || null,
+        cpuLimit: matchingMetric?.cpuLimit || null,
+        cpuUtilization: matchingMetric?.cpuUtilization || null,
+        memoryUsage: matchingMetric?.memoryUsage || null,
+        memoryRequest: matchingMetric?.memoryRequest || null,
+        memoryLimit: matchingMetric?.memoryLimit || null,
+        memoryUtilization: matchingMetric?.memoryUtilization || null,
+      };
+    });
+
+    console.log(pods, "pods");
+    return pods;
+  } catch (error) {
+    console.error("Failed to fetch Pods Data:", error);
+    throw error;
+  }
+}
+
 export function getDrSuffix(cloud) {
   const suffixMap = {
-    'azure': '-rg-cus-dr',
-    'aws': '-dr',
-    'gcp': '-drdd'
+    azure: "-rg-cus-dr",
+    aws: "-dr",
+    gcp: "-drdd",
   };
-  return suffixMap[cloud] || '-rg-cus-dr';
+  return suffixMap[cloud] || "-rg-cus-dr";
 }
+
+export const formatDateTime = (dateString) => {
+  if (!dateString) return "-";
+
+  const date = new Date(dateString);
+
+  // format parts
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}h`;
+};
+
+export const getLabel = (cloud) => {
+  switch (cloud?.toLowerCase()) {
+    case "azure":
+      return "Resource Group";
+    case "aws":
+      return "Tag";
+    case "gcp":
+      return "Project Name";
+    default:
+      return "Resource Group";
+  }
+};
+
 

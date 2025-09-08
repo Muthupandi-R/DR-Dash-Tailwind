@@ -13,6 +13,7 @@ import './AnimatedLogin.css';
 import earthGif from '../../assets/loginIcons/earth-rotate.gif'; // adjust path if needed
 import { useContext } from "react";
 import ContextApi from "../../context/ContextApi";
+
 export default function Login() {
   const { handleCloudChange } = useContext(ContextApi);
   const clouds = [
@@ -56,7 +57,7 @@ export default function Login() {
       <button
         ref={cardRef}
         onClick={onClick}
-        className={`group relative flex flex-col items-center justify-center w-55 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm card-entrance`}
+        className={`group relative flex flex-col items-center justify-center w-40 h-60 rounded-2xl ${cloud.bg} shadow-xl ${cloud.shadow} transition-all duration-300 hover:ring-4 ${cloud.ring} focus:outline-none overflow-hidden shine-effect backdrop-blur-sm card-entrance`}
         style={{ 
           boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)"
         }}
@@ -110,7 +111,7 @@ export default function Login() {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-primary-800 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center animate-rotate-border bg-conic/[from_var(--border-angle)] from-primary-400 via-primary-800 to-primary-400 relative overflow-hidden">
       {/* Earth GIF background, left side */}
       <img
         src={earthGif}
@@ -139,7 +140,7 @@ export default function Login() {
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-8">
-        <h1 className="relative text-5xl md:text-6xl font-extrabold mb-4 text-center overflow-hidden">
+        <h1 className="relative text-5xl md:text-6xl font-extrabold mb-4 text-center overflow-hidden animate-fade-in">
           <span
             className="inline-block bg-[linear-gradient(110deg,#a5f3fc,60%,#fff,80%,#c4b5fd)] bg-[length:200%_100%] bg-clip-text text-transparent animate-shine"
             style={{ WebkitBackgroundClip: 'text', backgroundClip: 'text' }}
