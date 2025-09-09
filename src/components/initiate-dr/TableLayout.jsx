@@ -45,7 +45,7 @@ const TableLayout = ({ leftTables, rightTables, progressData = {}, selectedRows,
           <span>There is no resources available on this project</span>
         </div>
       )}
-      <div className="flex gap-8 mt-2">
+      <div className="flex gap-10 mt-2">
         <div className="flex-1 flex flex-col gap-8">
           {!showFullBanner && leftNonEmpty.map((table, idx) => (
             <div key={table.key}>
