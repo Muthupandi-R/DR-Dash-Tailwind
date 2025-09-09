@@ -5,7 +5,7 @@ import DEFAULT_IMG from "../../assets/Icons/azure/functionapp.png";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { getIcon } from "../../utils/iconMap";
 import { FiMapPin } from "react-icons/fi";
-import ProgressBar from "./../progressbar/ProgressBar"
+import ProgressBar from "./../progressbar/ProgressBar";
 // Portal utility for tooltips
 const Portal = ({ children }) => {
   if (typeof document === "undefined") return null;
@@ -28,12 +28,9 @@ const TableComponent = ({
   const [tippyPos, setTippyPos] = useState({ left: 0, top: 0 });
   const infoIconRefs = useRef([]);
 
-  // Helper: is this a right-side placeholder row?
   const isPlaceholder = (row) => {
-    // If status is undefined/null/empty or resourceName ends with -CUS-dr/-rg-cus-dr/-drd/-drdd and status is missing
     if (row.status === undefined || row.status === null || row.status === "")
       return true;
-    // You can add more logic here if needed
     return false;
   };
 
@@ -52,10 +49,8 @@ const TableComponent = ({
   };
 
   return (
-    <div
-      className={`overflow-x-auto rounded-lg shadow-md bg-white border ${borderColor}`}
-    >
-      <table className="min-w-full divide-y divide-gray-200">
+    <div className={`shadow-md bg-white border ${borderColor}`}>
+      <table>
         <thead>
           <tr className={thColor}>
             <th className="p-3  text-left font-semibold text-xs w-[3rem]">
@@ -72,8 +67,12 @@ const TableComponent = ({
             <th className="p-3  text-left font-semibold text-xs w-[15rem]">
               Resource Name
             </th>
-            <th className="p-3  text-left font-semibold text-xs w-[12rem]">Location</th>
-            <th className="p-3  text-left font-semibold text-xs w-[14rem]">Status</th>
+            <th className="p-3  text-left font-semibold text-xs w-[12rem]">
+              Location
+            </th>
+            <th className="p-3  text-left font-semibold text-xs w-[14rem]">
+              Status
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -92,7 +91,7 @@ const TableComponent = ({
                   {showCheckbox ? (
                     <input
                       type="checkbox"
-                      checked={selectedRows.some(r => r.id === row.id)}
+                      checked={selectedRows.some((r) => r.id === row.id)}
                       onChange={() => handleCheckboxChange(row)}
                       className="accent-primary-500 focus:ring-2 focus:ring-primary-400 rounded border-gray-300"
                     />
@@ -148,9 +147,30 @@ const TableComponent = ({
                     {row?.location || "Unknown"}
                   </div>
                 </td>
-                <td className="p-3  align-middle text-xs w-[14rem]">
+                <td className="p-3  align-middle text-xs w-[14rem] relative">
                   {progressData?.[row.id] !== undefined ? (
-                    <ProgressBar value={progressData[row.id]} />
+                    <>
+                      <ProgressBar value={progressData[row.id]} />
+                      {/* Horizontal animated line */}
+                      {showCheckbox && (
+                        <div className="absolute top-1/2 left-full h-3 w-9 ml-1 bg-gray-200 overflow-hidden flex items-center">
+                          {/* Moving gradient line */}
+                          <div className="w-full h-[4px] bg-[linear-gradient(to_right,rgba(59,130,246,1)_0%,rgba(59,130,246,0)_100%)] bg-[length:12px_2px] animate-[moveDots_1s_linear_infinite]"></div>
+
+                          {/* Animated folder icon */}
+                          <div className="absolute top-1/2 -translate-y-1/2 animate-[moveFolder_2s_linear_infinite]">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-5 h-5 text-yellow-400"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414a2 2 0 00-.586-1.414l-3.414-3.414A2 2 0 0010.586 2H6zM11 3.5L15.5 8H12a1 1 0 01-1-1V3.5z" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   ) : showInfoIcon ? (
                     <span
                       className="relative"

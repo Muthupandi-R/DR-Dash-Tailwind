@@ -88,6 +88,19 @@ layer(base);
 	}
 }
 
+@keyframes moveDots {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 24px 0; /* matches bg-[length:12px_2px] */
+  }
+}
+@keyframes moveFolder {
+  0%   { transform: translateX(0);}
+  100% { transform: translateX(100px); } /* same as your line width */
+}
+
 .apexcharts-legend-marker {
 	display: none !important;
-  }
+}
