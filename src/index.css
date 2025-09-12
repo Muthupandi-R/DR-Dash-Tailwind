@@ -70,8 +70,6 @@ layer(base);
   }
 }
 
-
-
 @property --border-angle {
 	syntax: '<angle>';
 	inherits: false;
@@ -99,6 +97,28 @@ layer(base);
 @keyframes moveFolder {
   0%   { transform: translateX(0);}
   100% { transform: translateX(100px); } /* same as your line width */
+}
+
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 4s linear infinite;
+}
+
+@keyframes blink {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: var(--tab-bg); }
+}
+
+.animate-blink {
+  animation: blink 1s ease-in-out infinite;
 }
 
 .apexcharts-legend-marker {

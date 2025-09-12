@@ -1,16 +1,11 @@
-import React, { useState, useRef } from "react";
-import ReactDOM from "react-dom";
+import React, { useState } from "react";
 import { getOrderStatus } from "../../services/apiService";
 import DEFAULT_IMG from "../../assets/Icons/azure/functionapp.png";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { getIcon } from "../../utils/iconMap";
 import { FiMapPin } from "react-icons/fi";
 import ProgressBar from "./../progressbar/ProgressBar";
-// Portal utility for tooltips
-const Portal = ({ children }) => {
-  if (typeof document === "undefined") return null;
-  return ReactDOM.createPortal(children, document.body);
-};
+import ResourceProgress from "./ResourceProgress";
 
 const TableComponent = ({
   data = [],
@@ -20,13 +15,11 @@ const TableComponent = ({
   selectedCloud,
   onSelectResource,
   progressData,
+  checkBoxDisabled,
   selectedRows,
   setSelectedRows,
 }) => {
   const [hoveredIdx, setHoveredIdx] = useState(null);
-  const [infoTippyIdx, setInfoTippyIdx] = useState(null);
-  const [tippyPos, setTippyPos] = useState({ left: 0, top: 0 });
-  const infoIconRefs = useRef([]);
 
   const isPlaceholder = (row) => {
     if (row.status === undefined || row.status === null || row.status === "")
@@ -85,7 +78,8 @@ const TableComponent = ({
                 key={row?.id}
                 className={`h-12 transition-colors duration-200 ${
                   idx % 2 === 0 ? "bg-gray-50" : "bg-white"
-                } hover:bg-primary-50 group text-xs`}
+                } hover:bg-primary-50 group text-xs
+                ${progressData?.[row.id] !== undefined ? "animate-blink" : ""}`}
               >
                 <td className="p-3  align-middle text-xs w-[3rem]">
                   {showCheckbox ? (
@@ -93,6 +87,7 @@ const TableComponent = ({
                       type="checkbox"
                       checked={selectedRows.some((r) => r.id === row.id)}
                       onChange={() => handleCheckboxChange(row)}
+                      disabled={checkBoxDisabled}
                       className="accent-primary-500 focus:ring-2 focus:ring-primary-400 rounded border-gray-300"
                     />
                   ) : (
@@ -150,12 +145,23 @@ const TableComponent = ({
                 <td className="p-3  align-middle text-xs w-[14rem] relative">
                   {progressData?.[row.id] !== undefined ? (
                     <>
-                      <ProgressBar value={progressData[row.id]} />
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <ProgressBar value={progressData[row.id]} />
+                        </div>
+
+                        <ResourceProgress
+                          row={row}
+                          progressData={progressData}
+                        />
+                      </div>
                       {/* Horizontal animated line */}
                       {showCheckbox && (
                         <div className="absolute top-1/2 left-full h-3 w-9 ml-1 bg-gray-200 overflow-hidden flex items-center">
                           {/* Moving gradient line */}
-                          <div className="w-full h-[4px] bg-[linear-gradient(to_right,rgba(59,130,246,1)_0%,rgba(59,130,246,0)_100%)] bg-[length:12px_2px] animate-[moveDots_1s_linear_infinite]"></div>
+                          <div
+                            className={`w-full h-[4px] bg-[linear-gradient(to_right,rgba(59,130,246,1)_0%,rgba(59,130,246,0)_100%)] bg-[length:12px_2px] animate-[moveDots_1s_linear_infinite]`}
+                          ></div>
 
                           {/* Animated folder icon */}
                           <div className="absolute top-1/2 -translate-y-1/2 animate-[moveFolder_2s_linear_infinite]">
@@ -172,45 +178,19 @@ const TableComponent = ({
                       )}
                     </>
                   ) : showInfoIcon ? (
-                    <span
-                      className="relative"
-                      ref={(el) => (infoIconRefs.current[idx] = el)}
-                      onMouseEnter={(e) => {
-                        setInfoTippyIdx(idx);
-                        if (infoIconRefs.current[idx]) {
-                          const rect =
-                            infoIconRefs.current[idx].getBoundingClientRect();
-                          setTippyPos({
-                            left: rect.left + rect.width / 2,
-                            top: rect.top,
-                          });
-                        }
-                      }}
-                      onMouseLeave={() => setInfoTippyIdx(null)}
-                    >
+                    <div className="relative group">
                       <InformationCircleIcon className="w-6 h-6 text-yellow-500 cursor-pointer" />
-                      {infoTippyIdx === idx && (
-                        <Portal>
-                          <div
-                            className="z-50 px-4 py-2 rounded bg-yellow-200 text-yellow-900 text-xs font-semibold shadow-lg whitespace-nowrap animate-fade-in border border-yellow-300"
-                            style={{
-                              position: "fixed",
-                              left: tippyPos.left,
-                              top: tippyPos.top - 54, // 44px above the icon
-                              transform: "translateX(-50%)",
-                              pointerEvents: "none",
-                              maxWidth: "400px",
-                              minWidth: "180px",
-                              textAlign: "center",
-                            }}
-                          >
-                            Once you complete the failover <br />
-                            the resource will create
-                            <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-6 border-r-6 border-t-6 border-l-transparent border-r-transparent border-t-yellow-200"></div>
-                          </div>
-                        </Portal>
-                      )}
-                    </span>
+                      {/* Tooltip */}
+                      <div className="absolute left-1 bottom-full mb-2 w-64 bg-yellow-200 border border-yellow-300 rounded-xl shadow-lg p-4 text-xs text-yellow-900 opacity-0 font-semibold group-hover:opacity-100 pointer-events-none transition-all duration-300 transform -translate-x-1/2 scale-95 group-hover:scale-100 z-20 text-center">
+                        <div>
+                          Once you complete the failover <br />
+                          the resource will be created
+                        </div>
+
+                        {/* Decorative arrow at bottom */}
+                        <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-3 h-3 bg-yellow-200 border-r border-b border-yellow-300 rotate-45"></div>
+                      </div>
+                    </div>
                   ) : (
                     getOrderStatus(row?.status)
                   )}

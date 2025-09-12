@@ -120,6 +120,7 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
   const [tableConfigs, setTableConfigs] = useState([]);
   const [selectedLeftRows, setSelectedLeftRows] = useState([]);
   const [progressData, setProgressData] = useState({}); // Store progress per row
+  const [checkBoxDisabled, setCheckBoxDisabled] = useState(false)
   const [generatedPayload, setGeneratedPayload] = useState(null);
 
   const { selectedCloud } = useContext(ContextApi);
@@ -246,6 +247,7 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
   };   
 
   const handleInitiateDr = () => {
+    setCheckBoxDisabled(true);
     const updatedProgress = {};  
 
     console.log("🚀 DR Payload", generatedPayload);
@@ -286,6 +288,7 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
       });
     }, 300);
   };
+  
 
   // Determine how many skeletons to show per side based on current tableConfigs
   const leftSkeletons = tableConfigs.slice(
@@ -326,6 +329,7 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
           leftTables={leftTables}
           rightTables={rightTables}
           progressData={progressData}
+          checkBoxDisabled={checkBoxDisabled}
           selectedRows={selectedLeftRows}
           setSelectedRows={setSelectedLeftRows}
           onSelectResource={handleSelectResource}

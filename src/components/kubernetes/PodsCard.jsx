@@ -11,7 +11,6 @@ export default function PodsCard({
   selectedNamespace,
   setSelectedNamespace,
 }) {
-  console.log(pods, "pods");
   return (
     <div className="mt-1 bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/40 overflow-hidden shadow-lg">
       {/* Header */}
