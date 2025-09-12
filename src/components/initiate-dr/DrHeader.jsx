@@ -19,7 +19,7 @@ const DrHeader = ({
       <div className="flex items-center gap-4">
         {onBack && (
           <button
-            className="animate-shake mr-2 flex items-center justify-center w-8 h-8 rounded-full bg-primary-50 text-primary-600 shadow hover:bg-primary-100 hover:text-primary-800 transition-all duration-200 focus:outline-none border border-primary-100"
+            className="animate-shake mr-2 flex items-center justify-center w-8 h-8 rounded-full bg-primary-50 text-primary-600 shadow hover:bg-primary-100 hover:text-primary-800 transition-all duration-200 focus:outline-none border border-primary-100 cursor-pointer"
             onClick={onBack}
             title="Back"
           >
@@ -127,7 +127,7 @@ const DrHeader = ({
           </div>
           {/* Initiate DR Button */}
           <button
-            className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-xs px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2"
+            className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-xs px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2 cursor-pointer"
             onClick={onInitiateDr}
           >
             <svg

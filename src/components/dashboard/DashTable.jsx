@@ -30,6 +30,7 @@ export default function DashTable() {
   const [paginationTokens, setPaginationTokens] = useState([]); // initial page = ""
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(5);
+  const [hoveredIdx, setHoveredIdx] = useState(null);
 
   useEffect(() => {
     setPaginationTokens([""]); // reset to first page
@@ -153,7 +154,7 @@ export default function DashTable() {
       </div>
       <div className="border border-gray-200 rounded-lg mt-1 bg-white/80 shadow-lg">
         {tableLoading ? (
-          <SkeletonTable rows={8} columns={5} />
+          <SkeletonTable rows={5} columns={7} />
         ) : (
           <>
             <div className="max-h-[50vh] overflow-y-auto scrollbar-thin overflow-x-auto rounded-lg">
@@ -248,131 +249,142 @@ export default function DashTable() {
                       )}
                     </th>
                     <th>
-                      <div className="flex items-center gap-2">
-                        State
-                      </div>
+                      <div className="flex items-center gap-2">State</div>
                     </th>
                     <th>
-                      <div className="flex items-center gap-2">
-                        Type
-                      </div>
+                      <div className="flex items-center gap-2">Type</div>
                     </th>
 
                     <th>
                       <div className="flex items-center gap-2">
-                      Resource Tag
+                        Resource Tag
                       </div>
                     </th>
                     <th>
                       <div className="flex items-center gap-2">
-                       Project Name
+                        Project Name
                       </div>
                     </th>
                     <th>
-                      <div className="flex items-center gap-2">
-                        Location
-                      </div>
+                      <div className="flex items-center gap-2">Location</div>
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200/40">
                   {filteredData && filteredData.length > 0 ? (
-                    filteredData?.map((data, idx) => (
-                      <tr
-                        key={data.id}
-                        className={`${
-                          idx % 2 === 1 ? "bg-primary-50/40" : "bg-white"
-                        }`}
-                      >
-                        <td>
-                          <div className="inline-flex items-center">
-                            <label className="flex items-center cursor-pointer relative">
-                              <input
-                                type="checkbox"
-                                checked={selectedIds.includes(data.id)}
-                                className="peer h-3 w-3 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary-500 checked:border-primary-500"
-                                onChange={(e) =>
-                                  handleRowCheckboxChange(e, data.id)
-                                }
-                              />
-                              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    filteredData?.map((data, idx) => {
+                      const showTippy = data?.name && data?.name?.length > 10;
+                      return (
+                        <tr
+                          key={data.id}
+                          className={`${
+                            idx % 2 === 1 ? "bg-primary-50/40" : "bg-white"
+                          }`}
+                        >
+                          <td>
+                            <div className="inline-flex items-center">
+                              <label className="flex items-center cursor-pointer relative">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedIds.includes(data.id)}
+                                  className="peer h-3 w-3 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary-500 checked:border-primary-500"
+                                  onChange={(e) =>
+                                    handleRowCheckboxChange(e, data.id)
+                                  }
+                                />
+                                <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-3.5 w-3.5"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    stroke="currentColor"
+                                    strokeWidth="1"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                      clipRule="evenodd"
+                                    ></path>
+                                  </svg>
+                                </span>
+                              </label>
+                            </div>
+                          </td>
+                          <td className="whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <div className="relative">
+                                <ServiceIcon
+                                  cloud={selectedCloud}
+                                  serviceType={data?.type}
+                                />
+                                <div
+                                  className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow-sm 
+                                 ${getStatusColor(data?.state)}`}
+                                ></div>
+                              </div>
+                              <span className="relative max-w-[7rem] flex items-center font-semibold hover:text-primary-600">
+                                <span
+                                  className="truncate cursor-pointer"
+                                  onMouseEnter={() =>
+                                    setHoveredIdx(showTippy ? idx : null)
+                                  }
+                                  onMouseLeave={() => setHoveredIdx(null)}
+                                >
+                                  {data?.name}
+                                </span>
+                                {showTippy && hoveredIdx === idx && (
+                                  <div className="absolute left-1/2 -translate-x-1/2 -top-8 z-30 px-3 py-1 rounded bg-gray-900 text-white text-xs font-medium shadow-lg whitespace-nowrap pointer-events-none animate-fade-in">
+                                    {data?.name}
+                                    <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-6 border-r-6 border-t-6 border-l-transparent border-r-transparent border-t-gray-900"></div>
+                                  </div>
+                                )}
+                              </span>
+                            </div>
+                          </td>
+                          <td className=" whitespace-nowrap">
+                            {getOrderStatus(data?.state)}
+                          </td>
+                          <td className="whitespace-nowrap font-medium">
+                            {getResourceTypeLabel(data?.type, data?.kind)}
+                          </td>
+                          <td className="whitespace-nowrap font-medium">
+                            {data?.resourceTags?.Name || "-"}
+                          </td>
+                          <td className="whitespace-nowrap font-medium">
+                            {data?.projectName || "-"}
+                          </td>
+                          <td className="whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center">
                                 <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-3.5 w-3.5"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
+                                  className="w-3 h-3 text-white"
+                                  fill="none"
                                   stroke="currentColor"
-                                  strokeWidth="1"
+                                  viewBox="0 0 24 24"
                                 >
                                   <path
-                                    fillRule="evenodd"
-                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                    clipRule="evenodd"
-                                  ></path>
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                  />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                  />
                                 </svg>
+                              </div>
+                              <span className="text-xs text-gray-900 font-medium">
+                                {data?.location || "Unknown"}
                               </span>
-                            </label>
-                          </div>
-                        </td>
-                        <td className="whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <div className="relative">
-                              <ServiceIcon
-                                cloud={selectedCloud}
-                                serviceType={data?.type}
-                              />
-                              <div
-                                className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow-sm 
-                    ${getStatusColor(data?.state)}`}
-                              ></div>
                             </div>
-                            <span className="font-semibold hover:text-primary-600">
-                              {data?.name}
-                            </span>
-                          </div>
-                        </td>
-                        <td className=" whitespace-nowrap">
-                          {getOrderStatus(data?.state)}
-                        </td>
-                        <td className="whitespace-nowrap font-medium">
-                          {getResourceTypeLabel(data?.type, data?.kind)}
-                        </td>
-                        <td className="whitespace-nowrap font-medium">
-                          {data?.resourceTags?.Name || "-"}
-                        </td>
-                        <td className="whitespace-nowrap font-medium">
-                          {data?.projectName || "-"}
-                        </td>
-                        <td className="whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center">
-                              <svg
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                />
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                              </svg>
-                            </div>
-                            <span className="text-xs text-gray-900 font-medium">
-                              {data?.location || "Unknown"}
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
                       <td colSpan={7} className="text-center py-4">

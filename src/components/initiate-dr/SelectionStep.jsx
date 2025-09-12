@@ -62,6 +62,13 @@ const SelectionStep = ({ selectedCloud, onNext }) => {
            {`Select ${getLabel(selectedCloud)} and Regions`}
           </h2>
 
+          <CustomSelect
+            label="Source Region"
+            options={regionOptions}
+            value={sourceRegion}
+            onChange={setSourceRegion}
+            infoText="This is the region where all your resources originate."
+          />
           {/* Custom select components */}
           <CustomSelect
             label={getLabel(selectedCloud)}
@@ -70,23 +77,19 @@ const SelectionStep = ({ selectedCloud, onNext }) => {
             onChange={setProjectName}
             disabled={loading}
             selectedCloud={selectedCloud}
-          />
-          <CustomSelect
-            label="Source Region"
-            options={regionOptions}
-            value={sourceRegion}
-            onChange={setSourceRegion}
+            infoText="Choose the project under which the resource belongs. This defines the scope of the failover."
           />
           <CustomSelect
             label="Target Region"
             options={regionOptions}
             value={targetRegion}
             onChange={setTargetRegion}
+            infoText="Select the destination region where the resource will be created after failover."
           />
 
           {/* Submit button */}
           <button
-            className="mt-4 px-6 py-2 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 text-white rounded-full shadow-lg hover:scale-105 hover:bg-primary-700 transition-all duration-200 disabled:opacity-50 w-full focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2"
+            className={`mt-4 px-6 py-2 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 text-white rounded-full shadow-lg hover:scale-105 hover:bg-primary-700 transition-all duration-200 disabled:opacity-50 w-full focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 ${!projectName || !sourceRegion || !targetRegion ? "cursor-not-allowed" : "cursor-pointer"}`}
             disabled={!projectName || !sourceRegion || !targetRegion}
             onClick={handleNext}
           >

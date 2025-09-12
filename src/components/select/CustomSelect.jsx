@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiChevronDown } from "react-icons/fi";
 import { getLabel } from "../../services/apiService";
+import { Info } from 'lucide-react';
 
 const CustomSelect = ({
   label,
@@ -8,7 +9,9 @@ const CustomSelect = ({
   value,
   onChange,
   disabled = false,
-  selectedCloud
+  selectedCloud,
+  required = true,
+  infoText 
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState("bottom");
@@ -61,7 +64,22 @@ const CustomSelect = ({
 
   return (
     <div className="w-full">
-      <label className="block text-sm text-gray-600 mb-2">{label}</label>
+      <label className="block text-sm text-gray-600 mb-2 flex items-center gap-1">
+        {label} 
+        {required && <span className="text-red-500">*</span>}
+
+        {/* Info icon with tooltip */}
+        {infoText && (
+          <div className="relative group">
+            <Info className="w-4 h-4 text-yellow-500 cursor-pointer" />
+            <div className="absolute left-1 bottom-full mb-2 w-64 bg-yellow-200 border border-yellow-300 rounded-xl shadow-lg p-2 text-xs text-yellow-900 opacity-0 font-semibold group-hover:opacity-100 pointer-events-none transition-all duration-300 transform -translate-x-1/2 scale-95 group-hover:scale-100 z-20 text-center">
+              {infoText}
+                  <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-3 h-3 bg-yellow-200 border-r border-b border-yellow-300 rotate-45"></div>
+            </div>
+        
+          </div>
+        )}
+      </label>
       <div className="relative" ref={dropdownRef}>
         <button
           ref={buttonRef}
@@ -143,17 +161,17 @@ const CustomSelect = ({
                   disabled={label !== getLabel(selectedCloud) && option.value !== value}
                   className={`w-full px-3 py-2 text-sm text-left transition-colors duration-150 ${
                     option.value === value
-                      ? "bg-primary-100 text-primary-700 font-medium"
-                      : "text-gray-700 hover:bg-primary-50"
+                      ? "bg-primary-100 text-primary-700 font-medium "
+                      : "text-gray-700 hover:bg-primary-50 "
                   } ${
                     label !== getLabel(selectedCloud) && option.value !== value
                       ? "opacity-50 cursor-not-allowed"
-                      : ""
+                      : "cursor-pointer"
                   }`}
                 >
                   {option.label}
-                </button>
-              </li>
+                </button>   
+              </li>  
             ))}
           </ul>
         )}

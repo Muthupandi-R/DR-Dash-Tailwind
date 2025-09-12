@@ -32,7 +32,7 @@ const thColors = Object.entries(serviceGroups).reduce((acc, [style, labels]) => 
 }, {});
 
 
-const TableLayout = ({ leftTables, rightTables, progressData = {}, selectedRows, setSelectedRows, onSelectResource }) => {
+const TableLayout = ({ leftTables, rightTables, progressData = {}, checkBoxDisabled, selectedRows, setSelectedRows, onSelectResource }) => {
   const leftNonEmpty = leftTables.filter(table => table.data && table.data.length > 0);
   const rightNonEmpty = rightTables.filter(table => table.data && table.data.length > 0);
   const showFullBanner = leftNonEmpty.length === 0 && rightNonEmpty.length === 0;
@@ -53,7 +53,7 @@ const TableLayout = ({ leftTables, rightTables, progressData = {}, selectedRows,
                 {table.label}
               </div>
               <TableComponent data={table.data} bannerColor={table.color} borderColor={table.border} thColor={thColors[table.label]} showCheckbox={true} selectedCloud={selectedCloud} onSelectResource={onSelectResource}  
-             progressData={progressData} selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
+             progressData={progressData} checkBoxDisabled={checkBoxDisabled} selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
             </div>
           ))}
         </div>
@@ -61,7 +61,7 @@ const TableLayout = ({ leftTables, rightTables, progressData = {}, selectedRows,
           {!showFullBanner && rightNonEmpty.map((table, idx) => (
             <div key={table.key} className='mt-[28px]'>
               {/* No banner for right side tables */}
-              <TableComponent data={table.data} bannerColor={table.color} borderColor={table.border} thColor={thColors[table.label]} showCheckbox={false} selectedCloud={selectedCloud} progressData={progressData}/>
+              <TableComponent data={table.data} bannerColor={table.color} borderColor={table.border} thColor={thColors[table.label]} showCheckbox={false} selectedCloud={selectedCloud} progressData={progressData} checkBoxDisabled={checkBoxDisabled}/>
             </div>
           ))}
         </div>
