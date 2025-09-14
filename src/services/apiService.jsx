@@ -200,6 +200,32 @@ export const statusUpdate = (filteredData, setFilteredData, socketData) => {
   setFilteredData(updatedFiltered);
 };
 
+export async function fetchFailoverProgress(selectedCloud) {
+  try {
+     let apiUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/cloud/${selectedCloud}/failover/jobs/latest`;
+    const response = await axios.get(apiUrl);
+    return response?.data?.data
+  } catch (error) {
+    console.error("Failed to fetching check projectname, regions.", error);
+    throw error;
+  }
+}
+
+export async function fetchFailoverProgressResource(jobId) {
+  try {
+  let apiUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/cloud/failover/jobs/${jobId}/status`;
+    const response = await axios.get(apiUrl);
+    return response?.data?.data
+  } catch (error) {
+    console.error("Failed to fetch Failover Progress Resources:", error);
+    throw error;
+  }
+}
+
 export async function fetchProjects(selectedCloud) {
   try {
     let apiUrl = `${

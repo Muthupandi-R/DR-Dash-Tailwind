@@ -8,13 +8,13 @@ const REGION_OPTIONS = {
   gcp: ["us-east1", "us-central1-b", "asia-east1"],
 };
 
-const SelectionStep = ({ selectedCloud, onNext }) => {
+const SelectionStep = ({ selectedCloud, onNext, tabs }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [sourceRegion, setSourceRegion] = useState("");
   const [targetRegion, setTargetRegion] = useState("");
-
+  
   useEffect(() => {
     let isMounted = true;
     const loadProjects = async () => {
@@ -78,6 +78,7 @@ const SelectionStep = ({ selectedCloud, onNext }) => {
             disabled={loading}
             selectedCloud={selectedCloud}
             infoText="Choose the project under which the resource belongs. This defines the scope of the failover."
+           projectName={tabs}
           />
           <CustomSelect
             label="Target Region"
