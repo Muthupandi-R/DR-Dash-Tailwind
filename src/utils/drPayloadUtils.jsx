@@ -37,11 +37,12 @@ export function buildAzurePayload(rows, projectName) {
   );
 }
 
-export function buildAwsPayload(rows) {
+export function buildAwsPayload(rows, projectName) {
   return rows.reduce(
     (acc, item) => {
       if (!acc.provider) {
         acc.provider = "aws";
+        acc.projectName = projectName;
         acc.sourceRegion = item.location?.toLowerCase() || "us-east-2";
         acc.targetRegion = "us-west-1";
         acc.resourceSuffix = "-dr";

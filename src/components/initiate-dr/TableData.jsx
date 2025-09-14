@@ -1,13 +1,20 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import TableLayout from "./TableLayout";
 import DrHeader from "./DrHeader";
 import {
   fetchInitiateDrResources,
-  getDrSuffix
+  getDrSuffix,
+  fetchFailoverProgressResource,
 } from "../../services/apiService";
 import SkeletonTable from "../Loaders/SkeletonTable";
 import ContextApi from "../../context/ContextApi";
-import {buildAzurePayload, buildAwsPayload, buildGcpPayload, } from "../../utils/drPayloadUtils";
+import {
+  buildAzurePayload,
+  buildAwsPayload,
+  buildGcpPayload,
+} from "../../utils/drPayloadUtils";
+import axios from "axios";
+import useWebSocket from "./useWebSocket";
 
 // Table configuration for different clouds
 const getTableConfigs = (cloud) => {
@@ -113,17 +120,33 @@ const getTableConfigs = (cloud) => {
   return configs[cloud] || configs.azure;
 };
 
-const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
+const TableData = ({
+  projectName,
+  sourceRegion,
+  targetRegion,
+  onBack,
+  failoverData,
+  propTopicId 
+}) => {
   const [leftTables, setLeftTables] = useState([]);
   const [rightTables, setRightTables] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tableConfigs, setTableConfigs] = useState([]);
   const [selectedLeftRows, setSelectedLeftRows] = useState([]);
   const [progressData, setProgressData] = useState({}); // Store progress per row
-  const [checkBoxDisabled, setCheckBoxDisabled] = useState(false)
+  const [checkBoxDisabled, setCheckBoxDisabled] = useState(false);
   const [generatedPayload, setGeneratedPayload] = useState(null);
+  const [totalFailovered, setTotalFailovered] = useState({});
+  const [topicId, setTopicId] = useState(null);
 
   const { selectedCloud } = useContext(ContextApi);
+
+  // 🔹 if propTopicId is passed, set it
+  useEffect(() => {
+    if (propTopicId) {
+      setTopicId(propTopicId);
+    }
+  }, [propTopicId]);
 
   // Function to transform API data to table format
   const transformApiDataToTable = (apiData, tableConfig) => {
@@ -198,18 +221,82 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
         drProjectName,
         selectedCloud
       );
-      const processedLeftTables = currentTableConfigs.map((config) =>
-        transformApiDataToTable(leftData, config)
-      );
+      const progressMap = {};
+      const jobId = failoverData[0]?.jobId;
+
+      if (jobId) {
+        const progressRes = await fetchFailoverProgressResource(jobId);
+        console.log(progressRes, "progressRes");
+
+        if (progressRes.resources && Array.isArray(progressRes.resources)) {
+          progressRes.resources.forEach((res) => {
+            progressMap[res.resourceId] = res;
+          });
+        }
+        setTotalFailovered({
+          resourcesTotal: progressRes?.resourcesTotal,
+          resourcesCompleted: progressRes?.resourcesCompleted,
+          resourcesRunning: progressRes?.resourcesRunning,
+          resourcesFailed: progressRes?.resourcesFailed,
+        });
+      }
+
+      console.log(progressMap, "progressMap");
+
+      const processedLeftTables = currentTableConfigs.map((config) => {
+        const table = transformApiDataToTable(leftData, config);
+        return {
+          ...table,
+          data: table.data.map((row) => {
+            const progress = progressMap[row.resourceName]; // match by resourceName
+            return progress
+              ? {
+                  ...row,
+                  isFailover: true,
+                  progressPercent: Math.max(0, 100 - progress.progressPercent),
+                  progressStatus: progress.status,
+                  progressMessage: progress.message,
+                  steps: progress.steps,
+                }
+              : row;
+          }),
+        };
+      });
+      console.log(processedLeftTables, "processedLeftTables");
+
       const processedRightTables = currentTableConfigs.map((config) => {
         const leftTable = processedLeftTables.find(
           (table) => table.key === config.key
         );
+
+        // Match right side with progressMap using resourceName + suffix
+        const matchedRightData = matchRightSideData(
+          leftTable.data,
+          rightData,
+          suffix
+        ).map((row) => {
+          const progress =
+            progressMap[row?.resourceName.slice(0, -suffix.length)];
+          console.log(progress, "progress");
+          return progress
+            ? {
+                ...row,
+                isFailover: true,
+                progressPercent: progress.progressPercent,
+                progressStatus: progress.status,
+                progressMessage: progress.message,
+                steps: progress.steps,
+              }
+            : row;
+        });
+
         return {
           ...config,
-          data: matchRightSideData(leftTable.data, rightData, suffix),
+          data: matchedRightData,
         };
       });
+      console.log(processedRightTables, "processedRightTables");
+
       setLeftTables(processedLeftTables);
       setRightTables(processedRightTables);
     } catch (error) {
@@ -239,65 +326,194 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
     if (selectedCloud === "azure") {
       payload = buildAzurePayload(filteredRows, projectName);
     } else if (selectedCloud === "aws") {
-      payload = buildAwsPayload(filteredRows);
+      payload = buildAwsPayload(filteredRows, projectName);
     } else if (selectedCloud === "gcp") {
       payload = buildGcpPayload(filteredRows);
     }
     setGeneratedPayload(payload);
-  };   
-
-  const handleInitiateDr = () => {
-    setCheckBoxDisabled(true);
-    const updatedProgress = {};  
-
-    console.log("🚀 DR Payload", generatedPayload);
-
-    // Optionally call your DR initiation API
-    // await initiateDR(payload);
-
-    // Initialize progress bar for UI animation
-    selectedLeftRows.forEach((row) => {
-      updatedProgress[row.id] = 100;
-      updatedProgress[row.id + "-dr"] = 0;
-    });
-
-    setProgressData(updatedProgress);
-
-    const interval = setInterval(() => {
-      setProgressData((prev) => {
-        const next = { ...prev };
-        let done = true;
-
-        selectedLeftRows.forEach((row) => {
-          const leftId = row.id;
-          const rightId = row.id + "-dr";
-
-          if (next[leftId] > 0) {
-            next[leftId] = Math.max(0, next[leftId] - 10);
-            done = false;
-          }
-
-          if (next[rightId] < 100) {
-            next[rightId] = Math.min(100, next[rightId] + 10);
-            done = false;
-          }
-        });
-
-        if (done) clearInterval(interval);
-        return next;
-      });
-    }, 300);
   };
-  
+
+  // const handleInitiateDr = () => {
+  //   setCheckBoxDisabled(true);
+  //   const updatedProgress = {};
+
+  //   console.log("🚀 DR Payload", generatedPayload);
+
+  //   // Optionally call your DR initiation API
+  //   // await initiateDR(payload);
+
+  //   // Initialize progress bar for UI animation
+  //   selectedLeftRows.forEach((row) => {
+  //     updatedProgress[row.id] = 100;
+  //     updatedProgress[row.id + "-dr"] = 0;
+  //   });
+
+  //   setProgressData(updatedProgress);
+
+  //   const interval = setInterval(() => {
+  //     setProgressData((prev) => {
+  //       const next = { ...prev };
+  //       let done = true;
+
+  //       selectedLeftRows.forEach((row) => {
+  //         const leftId = row.id;
+  //         const rightId = row.id + "-dr";
+
+  //         if (next[leftId] > 0) {
+  //           next[leftId] = Math.max(0, next[leftId] - 10);
+  //           done = false;
+  //         }
+
+  //         if (next[rightId] < 100) {
+  //           next[rightId] = Math.min(100, next[rightId] + 10);
+  //           done = false;
+  //         }
+  //       });
+
+  //       if (done) clearInterval(interval);
+  //       return next;
+  //     });
+  //   }, 300);
+  // };
 
   // Determine how many skeletons to show per side based on current tableConfigs
+
+ // ✅ WebSocket subscription (auto-updates tables)
+  useWebSocket(topicId, (payload) => {
+    if (payload?.resources) {
+      updateTables(payload.resources);
+
+      setTotalFailovered({
+        resourcesTotal: payload.resourcesTotal,
+        resourcesCompleted: payload.resourcesCompleted,
+        resourcesRunning: payload.resourcesRunning,
+        resourcesFailed: payload.resourcesFailed,
+      });
+    }
+  });
+
+const handleInitiateDr = async () => {
+  if (!generatedPayload) return;
+
+  setCheckBoxDisabled(true);
+  console.log("🚀 DR Payload", generatedPayload);
+
+  try {
+    // 1. Call the failover initiation API
+    const response = await axios.post(
+      `https://devapi.drtestdash.com/disaster-recovery/api/cloud/v1/${selectedCloud}/failover-script/execute`,
+      generatedPayload
+    );
+
+    const result = response?.data?.data;
+    console.log(result, "🚀 DR Initiation Response");
+
+    const jobId = result?.jobId;
+    const topicId = result?.topic
+    if (!jobId) return;
+
+    // 2. Start polling immediately
+    const pollProgress = async () => {
+      try {
+        const progressRes = await fetchFailoverProgressResource(jobId);
+        console.log(progressRes, "📊 Progress Response");
+
+        setTotalFailovered({
+          resourcesTotal: progressRes.resourcesTotal,
+          resourcesCompleted: progressRes.resourcesCompleted,
+          resourcesRunning: progressRes.resourcesRunning,
+          resourcesFailed: progressRes.resourcesFailed,
+        });
+
+        if (progressRes?.resources) {
+          updateTables(progressRes.resources);
+        }
+
+        // // Keep polling until all completed
+        // const allDone = progressRes.resources?.every(
+        //   (r) => r.progressPercent === 100 || r.status === "Completed"
+        // );
+        // if (!allDone) {
+        //   setTimeout(pollProgress, 3000);
+        // }
+      } catch (err) {
+        console.error("Error while polling progress:", err);
+      }
+    };
+    pollProgress();
+    if (topicId) {
+        setTopicId(topicId); // 🚀 trigger WebSocket subscription
+      }
+
+  } catch (err) {
+    console.error("Error initiating DR:", err);
+  }
+};
+
+// Reusable function to update tables
+const updateTables = (resources) => {
+  const progressMap = {};
+  resources.forEach((res) => {
+    progressMap[res.resourceId] = res;
+  });
+
+  setLeftTables((prevTables) =>
+    prevTables.map((table) => ({
+      ...table,
+      data: table.data.map((row) => {
+        const progress = progressMap[row.resourceName];
+        return progress
+          ? {
+              ...row,
+              isFailover: true,
+              progressPercent: Math.max(0, 100 - progress.progressPercent),
+              progressStatus: progress.status,
+              progressMessage: progress.message,
+              steps: progress.steps,
+            }
+          : row;
+      }),
+    }))
+  );
+
+  setRightTables((prevTables) =>
+    prevTables.map((table) => ({
+      ...table,
+      data: table.data.map((row) => {
+        const suffix = getDrSuffix(selectedCloud);
+        const baseName = row.resourceName?.slice(0, -suffix.length);
+        const progress = progressMap[baseName];
+        return progress
+          ? {
+              ...row,
+              isFailover: true,
+              progressPercent: progress.progressPercent,
+              progressStatus: progress.status,
+              progressMessage: progress.message,
+              steps: progress.steps,
+            }
+          : row;
+      }),
+    }))
+  );
+};
+
+
+
   const leftSkeletons = tableConfigs.slice(
     0,
     Math.ceil(tableConfigs.length / 2)
   );
-  const rightSkeletons = tableConfigs.slice(0, Math.ceil(tableConfigs.length / 2));
-  const leftNonEmpty = leftTables.filter(table => table.data && table.data.length > 0);
-  const rightNonEmpty = rightTables.filter(table => table.data && table.data.length > 0);
+  const rightSkeletons = tableConfigs.slice(
+    0,
+    Math.ceil(tableConfigs.length / 2)
+  );
+  const leftNonEmpty = leftTables.filter(
+    (table) => table.data && table.data.length > 0
+  );
+  const rightNonEmpty = rightTables.filter(
+    (table) => table.data && table.data.length > 0
+  );
   const hideStepper = leftNonEmpty.length > 0 && rightNonEmpty.length > 0;
 
   return (
@@ -310,6 +526,7 @@ const TableData = ({ projectName, sourceRegion, targetRegion, onBack }) => {
         onBack={onBack}
         hideStepper={hideStepper}
         selectedCloud={selectedCloud}
+        totalFailovered={totalFailovered}
       />
       {loading ? (
         <div className="flex gap-8 mt-8">

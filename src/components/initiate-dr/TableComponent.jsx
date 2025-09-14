@@ -82,12 +82,12 @@ const TableComponent = ({
                 ${progressData?.[row.id] !== undefined ? "animate-blink" : ""}`}
               >
                 <td className="p-3  align-middle text-xs w-[3rem]">
-                  {showCheckbox ? (
+                  {(showCheckbox && !row?.isFailover) ? (
                     <input
                       type="checkbox"
                       checked={selectedRows.some((r) => r.id === row.id)}
                       onChange={() => handleCheckboxChange(row)}
-                      disabled={checkBoxDisabled}
+                      disabled={checkBoxDisabled || row?.isFailover}
                       className="accent-primary-500 focus:ring-2 focus:ring-primary-400 rounded border-gray-300"
                     />
                   ) : (
@@ -143,17 +143,14 @@ const TableComponent = ({
                   </div>
                 </td>
                 <td className="p-3  align-middle text-xs w-[14rem] relative">
-                  {progressData?.[row.id] !== undefined ? (
+                  {row?.progressStatus === "RUNNING" || row?.progressStatus === "PENDING" ? (
                     <>
                       <div className="flex items-center gap-2">
                         <div className="flex-1">
-                          <ProgressBar value={progressData[row.id]} />
+                          <ProgressBar value={row?.progressPercent} />
                         </div>
 
-                        <ResourceProgress
-                          row={row}
-                          progressData={progressData}
-                        />
+                        <ResourceProgress row={row} rotate={true}/>
                       </div>
                       {/* Horizontal animated line */}
                       {showCheckbox && (
@@ -177,6 +174,11 @@ const TableComponent = ({
                         </div>
                       )}
                     </>
+                  ) : row?.progressStatus === "SUCCEEDED" ? (
+                    <div className="flex items-center gap-2">
+                      {getOrderStatus(row?.status)}
+                      <ResourceProgress row={row} rotate={false}/>
+                    </div>
                   ) : showInfoIcon ? (
                     <div className="relative group">
                       <InformationCircleIcon className="w-6 h-6 text-yellow-500 cursor-pointer" />

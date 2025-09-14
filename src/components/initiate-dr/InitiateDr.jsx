@@ -1,9 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import TableData from "./TableData";
 import SelectionStep from "./SelectionStep";
 import ContextApi from "../../context/ContextApi";
 import project1 from "../../images/project.png";
-import './tabs.css'
+import { fetchFailoverProgress } from "../../services/apiService";
+import "./tabs.css";
 const MAX_TABS = 5;
 
 const defaultTab = {
@@ -19,13 +20,48 @@ const defaultTab = {
 
 const InitiateDr = () => {
   const { selectedCloud } = useContext(ContextApi);
-  const [tabs, setTabs] = useState([ { ...defaultTab } ]);
+  const [tabs, setTabs] = useState([{ ...defaultTab }]);
   const [activeTab, setActiveTab] = useState(1);
+  const [initialFailoverData, setInitialFailoverData] = useState([]);
+
+  // Fetch projects initially
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const projects = await fetchFailoverProgress(selectedCloud);
+        console.log(projects, "projects");
+
+        if (projects.length > 0) {
+          // Map projects to tabs
+          const projectTabs = projects.map((p, idx) => ({
+            id: idx + 1,
+            name: p.projectName,
+            step: "table", // directly go to table since project data is pre-filled
+            selection: {
+              projectName: p.projectName,
+              sourceRegion: p.sourceRegion,
+              targetRegion: p.targetRegion,
+            },
+            topicId: p.topic,
+          }));
+
+          setTabs(projectTabs);
+          setActiveTab(projectTabs[0].id); // set first tab as active
+          setInitialFailoverData(projects);
+        }
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const handleAddTab = () => {
     if (tabs.length >= MAX_TABS) return;
+    setInitialFailoverData([]);
     // const newTabId = tabs.length + 1;
-    const newTabId = Math.max(...tabs.map(t => t.id)) + 1;
+    const newTabId = Math.max(...tabs.map((t) => t.id)) + 1;
     const newTab = {
       id: newTabId,
       name: `New Project Tab${newTabId}`,
@@ -54,39 +90,58 @@ const InitiateDr = () => {
     setTabs(newTabs);
   };
 
-  const handleSelectionNext = (tabId, { projectName, sourceRegion, targetRegion }) => {
-    setTabs(tabs => tabs.map(tab =>
-      tab.id === tabId
-        ? { ...tab, step: "table",
-             name: projectName,
-           selection: { projectName, sourceRegion, targetRegion } }
-        : tab
-    ));
+  const handleSelectionNext = (
+    tabId,
+    { projectName, sourceRegion, targetRegion }
+  ) => {
+    setTabs((tabs) =>
+      tabs.map((tab) =>
+        tab.id === tabId
+          ? {
+              ...tab,
+              step: "table",
+              name: projectName,
+              selection: { projectName, sourceRegion, targetRegion },
+            }
+          : tab
+      )
+    );
   };
 
   const handleBack = (tabId) => {
-    setTabs(tabs => tabs.map(tab =>
-      tab.id === tabId
-        ? { ...tab, step: "selection",
-          name: "New Project Tab",
-         }
-        : tab
-    ));
+    setTabs((tabs) =>
+      tabs.map((tab) =>
+        tab.id === tabId
+          ? {
+              ...tab,
+              step: "selection",
+              name: "New Project Tab",
+              selection: {
+                projectName: "",
+                sourceRegion: "",
+                targetRegion: "",
+              },
+            }
+          : tab
+      )
+    );
   };
-console.log(tabs, "tabs")
+  console.log(tabs, "tabs");
   return (
     <div className="w-full h-full p-1 px-0 overflow-y-auto mt-10 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
       {/* Top Tabs */}
       <div className="overflow-x-auto scrollbar-hide">
         <ul className="tabs">
-        {tabs.map((tab, index) => {
+          {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
             const isLast = index === tabs.length - 1;
 
             return (
               <li
                 key={tab.id}
-                className={`${isActive ? "active" : ""} ${isLast ? "last-tab" : ""}`}
+                className={`${isActive ? "active" : ""} ${
+                  isLast ? "last-tab" : ""
+                }`}
               >
                 <a
                   href="#"
@@ -100,7 +155,9 @@ console.log(tabs, "tabs")
                       alt="Tab Icon"
                       className="tab-icon w-6 h-6"
                     />
-                    <span className="text-xs text-primary-900">{tab?.name || "New Project Tab"}</span>
+                    <span className="text-xs text-primary-900">
+                      {tab?.name || "New Project Tab"}
+                    </span>
                   </div>
 
                   {/* Right side: Close button */}
@@ -117,7 +174,6 @@ console.log(tabs, "tabs")
                     </button>
                   )}
                 </a>
-
               </li>
             );
           })}
@@ -137,15 +193,24 @@ console.log(tabs, "tabs")
         </ul>
       </div>
 
-
       {/* Component Area */}
       <div className="bg-primary-50 p-6 rounded shadow-md">
-        {tabs.map(tab => (
-          <div key={tab.id} style={{ display: activeTab === tab.id ? 'block' : 'none' }}>
+        {tabs.map((tab) => (
+          <div
+            key={tab.id}
+            style={{ display: activeTab === tab.id ? "block" : "none" }}
+          >
             {tab.step === "selection" ? (
               <SelectionStep
                 selectedCloud={selectedCloud}
-                onNext={({ projectName, sourceRegion, targetRegion }) => handleSelectionNext(tab.id, { projectName, sourceRegion, targetRegion })}
+                onNext={({ projectName, sourceRegion, targetRegion }) =>
+                  handleSelectionNext(tab.id, {
+                    projectName,
+                    sourceRegion,
+                    targetRegion,
+                  })
+                }
+                tabs={tabs}
               />
             ) : (
               <>
@@ -154,6 +219,8 @@ console.log(tabs, "tabs")
                   sourceRegion={tab.selection.sourceRegion}
                   targetRegion={tab.selection.targetRegion}
                   onBack={() => handleBack(tab.id)}
+                  failoverData={initialFailoverData}
+                  propTopicId={tab.topicId}
                 />
               </>
             )}
