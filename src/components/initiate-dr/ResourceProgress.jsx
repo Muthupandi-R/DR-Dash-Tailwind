@@ -41,7 +41,7 @@ const ResourceProgress = ({ row, rotate }) => {
 
       setPos({
         top: rect.top + window.scrollY - 290,
-        left: rect.left + window.scrollX - 200,
+        left: rect.left + window.scrollX - 100,
       });
       setShowStatusCard(!showStatusCard);
     }
