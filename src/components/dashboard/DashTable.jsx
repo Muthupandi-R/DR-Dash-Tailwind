@@ -161,7 +161,7 @@ export default function DashTable() {
               <table>
                 <thead className="bg-primary-200">
                   <tr className="bg-gradient-to-r from-primary-50 via-indigo-50 to-purple-50 border-b border-gray-200/60">
-                    <th>
+                    <th className="text-center align-middle">
                       <div className="inline-flex items-center">
                         <label className="flex items-center cursor-pointer relative">
                           <input
@@ -281,7 +281,7 @@ export default function DashTable() {
                             idx % 2 === 1 ? "bg-primary-50/40" : "bg-white"
                           }`}
                         >
-                          <td>
+                          <td className="text-center align-middle">
                             <div className="inline-flex items-center">
                               <label className="flex items-center cursor-pointer relative">
                                 <input
@@ -319,7 +319,7 @@ export default function DashTable() {
                                   serviceType={data?.type}
                                 />
                                 <div
-                                  className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow-sm 
+                                  className={`absolute -top-1 -right-1 w-2 h-2 rounded-full border-2 border-white shadow-sm 
                                  ${getStatusColor(data?.state)}`}
                                 ></div>
                               </div>
@@ -416,6 +416,6 @@ export default function DashTable() {
           }}
         />
       </div>
-    </div>
+    </div> 
   );
 }

@@ -11,7 +11,9 @@ const DrHeader = ({
   hideStepper,
   selectedCloud,
   totalFailovered,
+  selectedRows,
 }) => {
+  console.log(selectedRows, "selectedRows");
   const hasData =
     totalFailovered &&
     (totalFailovered.resourcesTotal ||
@@ -49,8 +51,10 @@ const DrHeader = ({
         {/* Show button here if no data */}
         {!hasData && hideStepper && (
           <button
-            className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-xs px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2 cursor-pointer"
+            className={`bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-xs px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2
+    ${selectedRows.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={onInitiateDr}
+            disabled={selectedRows.length === 0}
           >
             <svg
               className="w-5 h-5"
@@ -59,7 +63,11 @@ const DrHeader = ({
               strokeWidth="2.2"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 12l5 5L20 7"
+              />
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5" />
             </svg>
             Initiate DR
@@ -182,8 +190,10 @@ const DrHeader = ({
 
           {/* Initiate DR Button */}
           <button
-            className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-xs px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2 cursor-pointer"
+             className={`bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-xs px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2
+    ${selectedRows.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={onInitiateDr}
+            disabled={selectedRows.length === 0}
           >
             <svg
               className="w-5 h-5"
@@ -192,7 +202,11 @@ const DrHeader = ({
               strokeWidth="2.2"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 12l5 5L20 7"
+              />
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5" />
             </svg>
             Initiate DR
@@ -202,6 +216,5 @@ const DrHeader = ({
     </>
   );
 };
-
 
 export default DrHeader;

@@ -4,6 +4,7 @@ import ServiceIcon from "../service-icon/ServiceIcon";
 import ContextApi from "../../context/ContextApi";
 import SkeletonTable from "../Loaders/SkeletonTable";
 import { Cpu } from "lucide-react";
+import CardSkeleton from "../Loaders/CardSkeleton";
 
 const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
   console.log(clusters, "clusters");
@@ -29,7 +30,7 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
           </div>
 
           {/* Summary Stats */}
-          {!selectedCluster && (
+          {(!selectedCluster && !loading) ? (
             <div
               className={`mb-6 ${
                 selectedCluster
@@ -183,7 +184,13 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
                 </div>
               </div>
             </div>
-          )}
+          ) : loading ? <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {Array(3)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <CardSkeleton key={idx} />
+                  ))}
+              </div> : ""}
         </div>
 
         <div className={`bg-white/80 backdrop-blur-sm ${!selectedCluster ? "rounded-lg" : ""} border border-gray-200/40 overflow-hidden shadow-lg`}>

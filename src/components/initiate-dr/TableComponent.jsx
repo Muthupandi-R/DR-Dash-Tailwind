@@ -42,7 +42,15 @@ const TableComponent = ({
   };
 
   return (
-    <div className={`shadow-md bg-white border ${borderColor}`}>
+    <div
+      className={`shadow-md bg-white border ${borderColor} ${
+        data.some(
+          (row) => row?.progressStatus && row?.progressStatus !== "SUCCEEDED"
+        )
+          ? ""
+          : "rounded-lg overflow-x-auto"
+      }`}
+    >
       <table>
         <thead>
           <tr className={thColor}>
@@ -73,6 +81,12 @@ const TableComponent = ({
             const showTippy =
               row?.resourceName && row?.resourceName?.length > 8;
             const showInfoIcon = !showCheckbox && isPlaceholder(row);
+            const isStopped = row?.status?.toLowerCase() === "stopped";
+            const progress = row?.progressStatus?.toLowerCase();
+            const isFailoveredSuccessed = progress === "succeeded";
+            const isFailoveredInProgress =
+              progress === "pending" || progress === "running";
+
             return (
               <tr
                 key={row?.id}
@@ -81,20 +95,58 @@ const TableComponent = ({
                 } hover:bg-primary-50 group text-xs
                 ${progressData?.[row.id] !== undefined ? "animate-blink" : ""}`}
               >
-                <td className="p-3  align-middle text-xs w-[3rem]">
-                  {(showCheckbox && !row?.isFailover) ? (
-                    <input
-                      type="checkbox"
-                      checked={selectedRows.some((r) => r.id === row.id)}
-                      onChange={() => handleCheckboxChange(row)}
-                      disabled={checkBoxDisabled || row?.isFailover}
-                      className="accent-primary-500 focus:ring-2 focus:ring-primary-400 rounded border-gray-300"
-                    />
+                <td className="p-3 align-middle text-xs w-[3rem]">
+                  {showCheckbox && !row?.isFailover ? (
+                    <div className="relative inline-block">
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.some((r) => r.id === row.id)}
+                        onChange={() => handleCheckboxChange(row)}
+                        disabled={
+                          checkBoxDisabled || row?.isFailover || isStopped
+                        }
+                        className="peer accent-primary-500 focus:ring-2 focus:ring-primary-400 rounded border-gray-300 cursor-pointer disabled:cursor-not-allowed"
+                      />
+
+                      {/* Tooltip - only show when checkbox is hovered */}
+                      {isStopped && (
+                        <div className="absolute left-0 bottom-full -translate-y-1/2 hidden peer-hover:block bg-gray-800 text-white text-[10px] px-2 py-1 rounded shadow-lg whitespace-nowrap z-10">
+                          You can only select running resource
+                        </div>
+                      )}
+                    </div>
+                  ) : isFailoveredSuccessed ? (
+                    <div
+                      className="w-4 h-4 flex items-center justify-center rounded-full 
+                       bg-gradient-to-r from-green-400 via-green-500 to-green-600 shadow"
+                    >
+                      <svg
+                        className="w-4 h-4 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  ) : isFailoveredInProgress ? (
+                    <div
+                      className="w-4 h-4 rounded-full animate-spin 
+                      bg-conic-gradient bg-[conic-gradient(#4f46e5,#3b82f6,#06b6d4,#4f46e5)]"
+                    >
+                      <div className="w-3 h-3 m-1 bg-white rounded-full"></div>
+                    </div>
                   ) : (
                     <div className="w-4 h-4"></div>
                   )}
                 </td>
-                <td className="p-1  align-middle font-medium text-gray-800 group-hover:text-indigo-700  text-xs w-[15rem]">
+
+                <td className="p-1 align-middle font-medium text-gray-800 group-hover:text-indigo-700  text-xs w-[15rem]">
                   {/* Show initial if no image, else show image */}
                   <div className="relative flex items-center gap-2 ">
                     {(() => {
@@ -143,54 +195,60 @@ const TableComponent = ({
                   </div>
                 </td>
                 <td className="p-3  align-middle text-xs w-[14rem] relative">
-                  {row?.progressStatus === "RUNNING" || row?.progressStatus === "PENDING" ? (
+                  {isFailoveredInProgress ? (
                     <>
                       <div className="flex items-center gap-2">
                         <div className="flex-1">
                           <ProgressBar value={row?.progressPercent} />
                         </div>
 
-                        <ResourceProgress row={row} rotate={true}/>
+                        {/* <ResourceProgress row={row} rotate={true}/> */}
                       </div>
                       {/* Horizontal animated line */}
                       {showCheckbox && (
-                        <div className="absolute top-1/2 left-full h-3 w-9 ml-1 bg-gray-200 overflow-hidden flex items-center">
-                          {/* Moving gradient line */}
-                          <div
-                            className={`w-full h-[4px] bg-[linear-gradient(to_right,rgba(59,130,246,1)_0%,rgba(59,130,246,0)_100%)] bg-[length:12px_2px] animate-[moveDots_1s_linear_infinite]`}
-                          ></div>
-
-                          {/* Animated folder icon */}
-                          <div className="absolute top-1/2 -translate-y-1/2 animate-[moveFolder_2s_linear_infinite]">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="w-5 h-5 text-yellow-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414a2 2 0 00-.586-1.414l-3.414-3.414A2 2 0 0010.586 2H6zM11 3.5L15.5 8H12a1 1 0 01-1-1V3.5z" />
-                            </svg>
+                        <>
+                          <div className="absolute -top-1 left-full ml-1.5">
+                            <ResourceProgress row={row} rotate={true} />
                           </div>
-                        </div>
+
+                          <div className="absolute top-1/2 left-full h-3 w-9 ml-1 bg-gray-200 overflow-hidden flex items-center">
+                            {/* Moving gradient line */}
+                            <div
+                              className={`w-full h-[4px] bg-[linear-gradient(to_right,rgba(59,130,246,1)_0%,rgba(59,130,246,0)_100%)] bg-[length:12px_2px] animate-[moveDots_1s_linear_infinite]`}
+                            ></div>
+
+                            {/* Animated folder icon */}
+                            <div className="absolute top-1/2 -translate-y-1/2 animate-[moveFolder_2s_linear_infinite]">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-5 h-5 text-yellow-400"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414a2 2 0 00-.586-1.414l-3.414-3.414A2 2 0 0010.586 2H6zM11 3.5L15.5 8H12a1 1 0 01-1-1V3.5z" />
+                              </svg>
+                            </div>
+                          </div>
+                        </>
                       )}
                     </>
-                  ) : row?.progressStatus === "SUCCEEDED" ? (
+                  ) : isFailoveredSuccessed ? (
                     <div className="flex items-center gap-2">
                       {getOrderStatus(row?.status)}
-                      <ResourceProgress row={row} rotate={false}/>
+                      <ResourceProgress row={row} rotate={false} />
                     </div>
                   ) : showInfoIcon ? (
                     <div className="relative group">
-                      <InformationCircleIcon className="w-6 h-6 text-yellow-500 cursor-pointer" />
+                      <InformationCircleIcon className="w-6 h-6 text-primary-500 cursor-pointer" />
                       {/* Tooltip */}
-                      <div className="absolute left-1 bottom-full mb-2 w-64 bg-yellow-200 border border-yellow-300 rounded-xl shadow-lg p-4 text-xs text-yellow-900 opacity-0 font-semibold group-hover:opacity-100 pointer-events-none transition-all duration-300 transform -translate-x-1/2 scale-95 group-hover:scale-100 z-20 text-center">
+                      <div className="absolute left-3 bottom-full w-64 bg-primary-200 border border-primary-300 rounded-xl shadow-lg p-2 text-xs text-primary-900 opacity-0 font-semibold group-hover:opacity-100 pointer-events-none transition-all duration-300 transform -translate-x-1/2 scale-95 group-hover:scale-100 z-20 text-center">
                         <div>
                           Once you complete the failover <br />
                           the resource will be created
                         </div>
 
                         {/* Decorative arrow at bottom */}
-                        <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-3 h-3 bg-yellow-200 border-r border-b border-yellow-300 rotate-45"></div>
+                        <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-3 h-3 bg-primary-200 border-r border-b border-primary-300 rotate-45"></div>
                       </div>
                     </div>
                   ) : (

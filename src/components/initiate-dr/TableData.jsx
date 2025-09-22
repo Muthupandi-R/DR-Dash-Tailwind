@@ -15,6 +15,7 @@ import {
 } from "../../utils/drPayloadUtils";
 import axios from "axios";
 import useWebSocket from "./useWebSocket";
+import CardSkeleton from "../Loaders/CardSkeleton";
 
 // Table configuration for different clouds
 const getTableConfigs = (cloud) => {
@@ -126,7 +127,7 @@ const TableData = ({
   targetRegion,
   onBack,
   failoverData,
-  propTopicId 
+  propTopicId,
 }) => {
   const [leftTables, setLeftTables] = useState([]);
   const [rightTables, setRightTables] = useState([]);
@@ -378,7 +379,7 @@ const TableData = ({
 
   // Determine how many skeletons to show per side based on current tableConfigs
 
- // ✅ WebSocket subscription (auto-updates tables)
+  // ✅ WebSocket subscription (auto-updates tables)
   useWebSocket(topicId, (payload) => {
     if (payload?.resources) {
       updateTables(payload.resources);
@@ -392,113 +393,110 @@ const TableData = ({
     }
   });
 
-const handleInitiateDr = async () => {
-  if (!generatedPayload) return;
+  const handleInitiateDr = async () => {
+    if (!generatedPayload) return;
 
-  setCheckBoxDisabled(true);
-  console.log("🚀 DR Payload", generatedPayload);
+    setCheckBoxDisabled(true);
+    console.log("🚀 DR Payload", generatedPayload);
 
-  try {
-    // 1. Call the failover initiation API
-    const response = await axios.post(
-      `https://devapi.drtestdash.com/disaster-recovery/api/cloud/v1/${selectedCloud}/failover-script/execute`,
-      generatedPayload
-    );
+    try {
+      // 1. Call the failover initiation API
+      const response = await axios.post(
+        `https://devapi.drtestdash.com/disaster-recovery/api/cloud/v1/${selectedCloud}/failover-script/execute`,
+        generatedPayload
+      );
 
-    const result = response?.data?.data;
-    console.log(result, "🚀 DR Initiation Response");
+      const result = response?.data?.data;
+      console.log(result, "🚀 DR Initiation Response");
 
-    const jobId = result?.jobId;
-    const topicId = result?.topic
-    if (!jobId) return;
+      const jobId = result?.jobId;
+      const topicId = result?.topic;
+      if (!jobId) return;
 
-    // 2. Start polling immediately
-    const pollProgress = async () => {
-      try {
-        const progressRes = await fetchFailoverProgressResource(jobId);
-        console.log(progressRes, "📊 Progress Response");
+      // 2. Start polling immediately
+      const pollProgress = async () => {
+        try {
+          const progressRes = await fetchFailoverProgressResource(jobId);
+          console.log(progressRes, "📊 Progress Response");
 
-        setTotalFailovered({
-          resourcesTotal: progressRes.resourcesTotal,
-          resourcesCompleted: progressRes.resourcesCompleted,
-          resourcesRunning: progressRes.resourcesRunning,
-          resourcesFailed: progressRes.resourcesFailed,
-        });
+          setTotalFailovered({
+            resourcesTotal: progressRes.resourcesTotal,
+            resourcesCompleted: progressRes.resourcesCompleted,
+            resourcesRunning: progressRes.resourcesRunning,
+            resourcesFailed: progressRes.resourcesFailed,
+          });
 
-        if (progressRes?.resources) {
-          updateTables(progressRes.resources);
+          if (progressRes?.resources) {
+            updateTables(progressRes.resources);
+          }
+
+          // // Keep polling until all completed
+          // const allDone = progressRes.resources?.every(
+          //   (r) => r.progressPercent === 100 || r.status === "Completed"
+          // );
+          // if (!allDone) {
+          //   setTimeout(pollProgress, 3000);
+          // }
+        } catch (err) {
+          console.error("Error while polling progress:", err);
         }
-
-        // // Keep polling until all completed
-        // const allDone = progressRes.resources?.every(
-        //   (r) => r.progressPercent === 100 || r.status === "Completed"
-        // );
-        // if (!allDone) {
-        //   setTimeout(pollProgress, 3000);
-        // }
-      } catch (err) {
-        console.error("Error while polling progress:", err);
-      }
-    };
-    pollProgress();
-    if (topicId) {
+      };
+      pollProgress();
+      if (topicId) {
         setTopicId(topicId); // 🚀 trigger WebSocket subscription
       }
+    } catch (err) {
+      console.error("Error initiating DR:", err);
+    }
+  };
 
-  } catch (err) {
-    console.error("Error initiating DR:", err);
-  }
-};
+  // Reusable function to update tables
+  const updateTables = (resources) => {
+    const progressMap = {};
+    resources.forEach((res) => {
+      progressMap[res.resourceId] = res;
+    });
 
-// Reusable function to update tables
-const updateTables = (resources) => {
-  const progressMap = {};
-  resources.forEach((res) => {
-    progressMap[res.resourceId] = res;
-  });
+    setLeftTables((prevTables) =>
+      prevTables.map((table) => ({
+        ...table,
+        data: table.data.map((row) => {
+          const progress = progressMap[row.resourceName];
+          return progress
+            ? {
+                ...row,
+                isFailover: true,
+                progressPercent: Math.max(0, 100 - progress.progressPercent),
+                progressStatus: progress.status,
+                progressMessage: progress.message,
+                steps: progress.steps,
+              }
+            : row;
+        }),
+      }))
+    );
 
-  setLeftTables((prevTables) =>
-    prevTables.map((table) => ({
-      ...table,
-      data: table.data.map((row) => {
-        const progress = progressMap[row.resourceName];
-        return progress
-          ? {
-              ...row,
-              isFailover: true,
-              progressPercent: Math.max(0, 100 - progress.progressPercent),
-              progressStatus: progress.status,
-              progressMessage: progress.message,
-              steps: progress.steps,
-            }
-          : row;
-      }),
-    }))
-  );
-
-  setRightTables((prevTables) =>
-    prevTables.map((table) => ({
-      ...table,
-      data: table.data.map((row) => {
-        const suffix = getDrSuffix(selectedCloud);
-        const baseName = row.resourceName?.slice(0, -suffix.length);
-        const progress = progressMap[baseName];
-        return progress
-          ? {
-              ...row,
-              isFailover: true,
-              progressPercent: progress.progressPercent,
-              progressStatus: progress.status,
-              progressMessage: progress.message,
-              steps: progress.steps,
-            }
-          : row;
-      }),
-    }))
-  );
-};
-
-
+    setRightTables((prevTables) =>
+      prevTables.map((table) => ({
+        ...table,
+        data: table.data.map((row) => {
+          const suffix = getDrSuffix(selectedCloud);
+          const baseName = row.resourceName?.slice(0, -suffix.length);
+          const progress = progressMap[baseName];
+          return progress
+            ? {
+                ...row,
+                isFailover: true,
+                progressPercent: progress.progressPercent,
+                progressStatus: progress.status,
+                progressMessage: progress.message,
+                steps: progress.steps,
+              }
+            : row;
+        }),
+      }))
+    );
+  };
 
   const leftSkeletons = tableConfigs.slice(
     0,
@@ -527,18 +525,41 @@ const updateTables = (resources) => {
         hideStepper={hideStepper}
         selectedCloud={selectedCloud}
         totalFailovered={totalFailovered}
+        selectedRows={selectedLeftRows}
       />
       {loading ? (
-        <div className="flex gap-8 mt-8">
-          <div className="flex-1 flex flex-col gap-8">
-            {leftSkeletons.map((_, idx) => (
-              <SkeletonTable key={idx} />
-            ))}
-          </div>
-          <div className="flex-1 flex flex-col gap-8">
-            {rightSkeletons.map((_, idx) => (
-              <SkeletonTable key={idx} />
-            ))}
+        <div className="flex flex-col gap-6 mt-8">
+          {/* Card Skeleton Row */}
+          {failoverData.length !== 0 && (
+            <div className="flex items-center justify-between">
+              {/* Skeleton Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                {Array(4)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <CardSkeleton key={idx} />
+                  ))}
+              </div>
+
+              {/* Button Skeleton */}
+              <div className="ml-4">
+                <div className="animate-pulse h-10 w-32 bg-gray-300 rounded-2xl"></div>
+              </div>
+            </div>
+          )}
+
+          {/* Table Skeletons */}
+          <div className="flex gap-8">
+            <div className="flex-1 flex flex-col gap-8">
+              {leftSkeletons.map((_, idx) => (
+                <SkeletonTable key={idx} />
+              ))}
+            </div>
+            <div className="flex-1 flex flex-col gap-8">
+              {rightSkeletons.map((_, idx) => (
+                <SkeletonTable key={idx} />
+              ))}
+            </div>
           </div>
         </div>
       ) : (
