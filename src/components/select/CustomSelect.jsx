@@ -13,9 +13,7 @@ const CustomSelect = ({
   required = true,
   infoText,
   projectName,
-}) => {
-  console.log(projectName, "projectNamekg");
-  
+}) => {  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState("bottom");
   const dropdownRef = useRef(null);

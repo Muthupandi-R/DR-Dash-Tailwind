@@ -3,7 +3,6 @@ import TableLayout from "./TableLayout";
 import DrHeader from "./DrHeader";
 import {
   fetchInitiateDrResources,
-  getDrSuffix,
   fetchFailoverProgressResource,
 } from "../../services/apiService";
 import SkeletonTable from "../Loaders/SkeletonTable";
@@ -128,7 +127,9 @@ const TableData = ({
   onBack,
   failoverData,
   propTopicId,
+  suffix
 }) => {
+  console.log(suffix, "suffix")
   const [leftTables, setLeftTables] = useState([]);
   const [rightTables, setRightTables] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -210,7 +211,6 @@ const TableData = ({
     if (!projectName) return;
     setLoading(true);
     try {
-      const suffix = getDrSuffix(selectedCloud);
       const drProjectName = projectName + suffix;
       const currentTableConfigs = getTableConfigs(selectedCloud);
       setTableConfigs(currentTableConfigs);
@@ -309,7 +309,7 @@ const TableData = ({
       setRightTables(emptyTables);
     } finally {
       setLoading(false);
-    }
+    }   
   };
 
   // Fetch data when projectName changes
@@ -480,7 +480,6 @@ const TableData = ({
       prevTables.map((table) => ({
         ...table,
         data: table.data.map((row) => {
-          const suffix = getDrSuffix(selectedCloud);
           const baseName = row.resourceName?.slice(0, -suffix.length);
           const progress = progressMap[baseName];
           return progress
@@ -526,6 +525,7 @@ const TableData = ({
         selectedCloud={selectedCloud}
         totalFailovered={totalFailovered}
         selectedRows={selectedLeftRows}
+        suffix={suffix}
       />
       {loading ? (
         <div className="flex flex-col gap-6 mt-8">
