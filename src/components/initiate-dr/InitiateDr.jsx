@@ -23,6 +23,7 @@ const InitiateDr = () => {
   const [tabs, setTabs] = useState([{ ...defaultTab }]);
   const [activeTab, setActiveTab] = useState(1);
   const [initialFailoverData, setInitialFailoverData] = useState([]);
+  const [suffix, setSuffix] = useState("-dr")
 
   // Fetch projects initially
   useEffect(() => {
@@ -43,6 +44,7 @@ const InitiateDr = () => {
               targetRegion: p.targetRegion,
             },
             topicId: p.topic,
+            suffix: suffix
           }));
 
           setTabs(projectTabs);
@@ -102,6 +104,7 @@ const InitiateDr = () => {
               step: "table",
               name: projectName,
               selection: { projectName, sourceRegion, targetRegion },
+              suffix: suffix,
             }
           : tab
       )
@@ -221,6 +224,7 @@ const InitiateDr = () => {
                   onBack={() => handleBack(tab.id)}
                   failoverData={initialFailoverData}
                   propTopicId={tab.topicId}
+                  suffix={tab.suffix}
                 />
               </>
             )}

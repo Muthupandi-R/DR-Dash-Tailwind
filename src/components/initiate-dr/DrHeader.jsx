@@ -12,6 +12,7 @@ const DrHeader = ({
   selectedCloud,
   totalFailovered,
   selectedRows,
+  suffix
 }) => {
   console.log(selectedRows, "selectedRows");
   const hasData =
@@ -45,6 +46,9 @@ const DrHeader = ({
             <span className="flex items-center gap-1 bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-purple-100">
               <span className="font-semibold">Target:</span> {targetRegion}
             </span>
+            <span className="flex items-center gap-1 bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-purple-100">
+              <span className="font-semibold">Suffix:</span> {suffix}
+            </span>
           </div>
         </div>
 
@@ -52,7 +56,7 @@ const DrHeader = ({
         {!hasData && hideStepper && (
           <button
             className={`bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white text-xs px-6 py-2 rounded-2xl font-semibold shadow hover:scale-105 transition-transform duration-200 focus:outline-none flex items-center gap-2
-    ${selectedRows.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+             ${selectedRows.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={onInitiateDr}
             disabled={selectedRows.length === 0}
           >
