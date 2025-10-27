@@ -247,7 +247,7 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200/40">
-                  {clusters.map((cluster, index) => (
+                  {clusters.map((cluster, index) => ( 
                     <tr
                       key={index}
                       className={`${

@@ -13,6 +13,8 @@ import './AnimatedLogin.css';
 import earthGif from '../../assets/loginIcons/earth-rotate.gif'; // adjust path if needed
 import { useContext } from "react";
 import ContextApi from "../../context/ContextApi";
+import { useMsal } from "@azure/msal-react";
+import { loginRequest } from "../../authConfig"
 
 export default function Login() {
   const { handleCloudChange } = useContext(ContextApi);
@@ -95,9 +97,30 @@ export default function Login() {
     );
   }
   const navigate = useNavigate();
+  const handleAzureLogin = async () => {
+    try {
+      const response = await instance.loginPopup(loginRequest);
+      const account = response.account;    
+
+      if (account) {
+        handleCloudChange("azure");
+        sessionStorage.setItem("accessToken", response.accessToken);
+        sessionStorage.setItem("userEmail", account.username);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("Azure login failed:", error);
+    }
+  };
+
+  const { instance } = useMsal();
   const handleCloudClick = (provider) => {
-    handleCloudChange(provider);
-    navigate("/dashboard");
+    if (provider === "azure") {
+      handleAzureLogin(); // Use MSAL for Azure login 
+    } else {
+      handleCloudChange(provider); 
+      navigate("/dashboard");
+    }
   };
 
   // Generate positions for floating icons with better spacing between them
@@ -108,7 +131,7 @@ export default function Login() {
     { x: 80, y: 80 },   // Bottom right
     { x: 50, y: 15 },   // Top center
     { x: 45, y: 85 }    // Bottom center
-  ];
+  ];             
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center animate-rotate-border bg-conic/[from_var(--border-angle)] from-primary-400 via-primary-800 to-primary-400 relative overflow-hidden">
@@ -118,8 +141,8 @@ export default function Login() {
         alt="Earth"
         className="absolute left-0 bottom-0 w-1/3 max-w-xs opacity-80 pointer-events-none select-none"
         style={{ zIndex: 1 }}
-      />
-      {/* Animated background elements */}
+      />         
+      {/* Animated background elements */} 
       <div className="absolute inset-0">
         {/* Gradient orbs */}
         <div className="absolute top-20 left-20 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-blob1"></div>
@@ -136,17 +159,17 @@ export default function Login() {
             position={floatingPositions[index]}
           />
         ))}
-      </div>
-
-      {/* Main content */}
+      </div>  
+                
+      {/* Main content */}  
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-8">
-        <h1 className="relative text-5xl md:text-6xl font-extrabold mb-4 text-center overflow-hidden animate-fade-in">
+        <h1 className="relative text-5xl md:text-6xl font-extrabold mb-4 text-center overflow-hidden      animate-fade-in">
           <span
             className="inline-block bg-[linear-gradient(110deg,#a5f3fc,60%,#fff,80%,#c4b5fd)] bg-[length:200%_100%] bg-clip-text text-transparent animate-shine"
             style={{ WebkitBackgroundClip: 'text', backgroundClip: 'text' }}
           >
             Disaster Recovery
-          </span>
+          </span>  
         </h1>
         <p className="text-xl md:text-2xl bg-gradient-to-r from-primary-200 via-cyan-200 to-purple-200 bg-clip-text text-transparent drop-shadow-lg mb-12 text-center animate-fade-in">
           Select your cloud provider to continue
@@ -158,10 +181,10 @@ export default function Login() {
               key={cloud.name}
               cloud={cloud}
               onClick={() => handleCloudClick(cloud.name.toLowerCase())}
-            />
-          ))}
+            />    
+          ))}  
         </div>
-      </div>
-    </div>
+      </div>   
+    </div>  
   );
 }
