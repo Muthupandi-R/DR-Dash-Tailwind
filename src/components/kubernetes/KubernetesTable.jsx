@@ -247,7 +247,7 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200/40">
-                  {clusters.map((cluster, index) => (
+                  {clusters ? (clusters.map((cluster, index) => (
                     <tr
                       key={index}
                       className={`${
@@ -349,7 +349,9 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
                         </>
                       )}
                     </tr>
-                  ))}
+                  ))) : (
+                    <tr>no data available</tr>
+                  )}
                 </tbody>
               </table>
             )}
