@@ -14,7 +14,7 @@ import earthGif from '../../assets/loginIcons/earth-rotate.gif'; // adjust path 
 import { useContext } from "react";
 import ContextApi from "../../context/ContextApi";
 import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "../../authConfig"
+import { loginRequest } from "../../authConfig" 
 
 export default function Login() {
   const { handleCloudChange } = useContext(ContextApi);
