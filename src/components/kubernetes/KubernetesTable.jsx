@@ -11,7 +11,11 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
   const { selectedCloud } = useContext(ContextApi);
 
   return (
-    <div className={`w-full h-full bg-gradient-to-br from-white via-primary-50/30 to-indigo-50/20 ${!selectedCluster ? "rounded-2xl" : ""} border border-gray-200/60 shadow-lg shadow-primary-500/10 overflow-hidden backdrop-blur-sm`}>
+    <div
+      className={`w-full h-full bg-gradient-to-br from-white via-primary-50/30 to-indigo-50/20 ${
+        !selectedCluster ? "rounded-2xl" : ""
+      } border border-gray-200/60 shadow-lg shadow-primary-500/10 overflow-hidden backdrop-blur-sm`}
+    >
       <div className={`${!selectedCluster ? "p-6" : "p-2"}`}>
         <div className="flex items-center justify-between">
           <div className={`${!selectedCluster ? "mb-6" : "mb-2"}`}>
@@ -30,7 +34,7 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
           </div>
 
           {/* Summary Stats */}
-          {(!selectedCluster && !loading) ? (
+          {!selectedCluster && !loading ? (
             <div
               className={`mb-6 ${
                 selectedCluster
@@ -184,16 +188,24 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
                 </div>
               </div>
             </div>
-          ) : loading ? <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {Array(3)
-                  .fill(0)
-                  .map((_, idx) => (
-                    <CardSkeleton key={idx} />
-                  ))}
-              </div> : ""}
+          ) : loading ? (
+            <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {Array(3)
+                .fill(0)
+                .map((_, idx) => (
+                  <CardSkeleton key={idx} />
+                ))}
+            </div>
+          ) : (
+            ""
+          )}
         </div>
 
-        <div className={`bg-white/80 backdrop-blur-sm ${!selectedCluster ? "rounded-lg" : ""} border border-gray-200/40 overflow-hidden shadow-lg`}>
+        <div
+          className={`bg-white/80 backdrop-blur-sm ${
+            !selectedCluster ? "rounded-lg" : ""
+          } border border-gray-200/40 overflow-hidden shadow-lg`}
+        >
           <div
             className={`overflow-x-auto ${
               clusters.length > 6 ? "max-h-96 overflow-y-auto" : ""
@@ -247,52 +259,54 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200/40">
-                  {clusters.map((cluster, index) => ( 
-                    <tr
-                      key={index}
-                      className={`${
-                        selectedCluster &&
-                        ((selectedCluster?.id &&
-                          selectedCluster?.id === cluster?.id) ||
-                          selectedCluster?.name === cluster?.name)
-                          ? "bg-primary-100 ring-2 ring-primary-300 border-l-4 border-primary-500"
-                          : index % 2 === 1
-                          ? "bg-primary-50/40"
-                          : "bg-white"
-                      } cursor-pointer group`}
-                      onClick={() => onSelect(cluster)}
-                    >
-                      <td className="whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <ServiceIcon
-                              cloud={selectedCloud}
-                              serviceType={cluster?.type}
-                            />
-                            <div
-                              className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow-sm 
+                  {clusters && clusters.length > 0 ? (
+                    clusters.map((cluster, index) => (
+                      <tr
+                        key={index}
+                        className={`${
+                          selectedCluster &&
+                          ((selectedCluster?.id &&
+                            selectedCluster?.id === cluster?.id) ||
+                            selectedCluster?.name === cluster?.name)
+                            ? "bg-primary-100 ring-2 ring-primary-300 border-l-4 border-primary-500"
+                            : index % 2 === 1
+                            ? "bg-primary-50/40"
+                            : "bg-white"
+                        } cursor-pointer group`}
+                        onClick={() => onSelect(cluster)}
+                      >
+                        <td className="whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <div className="relative">
+                              <ServiceIcon
+                                cloud={selectedCloud}
+                                serviceType={cluster?.type}
+                              />
+                              <div
+                                className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow-sm 
                     ${
-                      cluster?.state.toLowerCase() === "running" || cluster?.state.toLowerCase() === "active"
+                      cluster?.state.toLowerCase() === "running" ||
+                      cluster?.state.toLowerCase() === "active"
                         ? "bg-green-500"
                         : "bg-red-500"
                     }`}
-                            ></div>
+                              ></div>
+                            </div>
+                            <div>
+                              <span className="text-xs font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                                {cluster?.name}
+                              </span>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-xs font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
-                              {cluster?.name}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-                      {!selectedCluster && (
-                        <>
-                          <td className="p-2 whitespace-nowrap">
-                            {getOrderStatus(cluster?.state)}
-                          </td>
+                        </td>
+                        {!selectedCluster && (
+                          <>
+                            <td className="p-2 whitespace-nowrap">
+                              {getOrderStatus(cluster?.state)}
+                            </td>
 
-                          <td>
-                            {/* <div className="flex items-center gap-2">
+                            <td>
+                              {/* <div className="flex items-center gap-2">
                               <div className="w-4 h-4 bg-gradient-to-br from-rose-500 to-pink-600 rounded-full flex items-center justify-center">
                                 <span className="text-white text-xs font-bold">
                                   {cluster?.projectName
@@ -304,54 +318,64 @@ const KubernetesTable = ({ clusters, onSelect, selectedCluster, loading }) => {
                                 {cluster?.projectName || "-"}
                               </span>
                             </div> */}
-                             <span className="text-xs text-gray-900">
+                              <span className="text-xs text-gray-900">
                                 {cluster?.projectName || "-"}
                               </span>
-                          </td>
-                          <td>
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center">
-                                <Cpu className="text-white" size={12} />
+                            </td>
+                            <td>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center">
+                                  <Cpu className="text-white" size={12} />
+                                </div>
+                                <span className="text-xs text-gray-900 font-medium">
+                                  {cluster?.kubernetesVersion || "Unknown"}
+                                </span>
                               </div>
-                              <span className="text-xs text-gray-900 font-medium">
-                                {cluster?.kubernetesVersion || "Unknown"}
-                              </span>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center">
-                                <svg
-                                  className="w-3 h-3 text-white"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                  />
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                  />
-                                </svg>
+                            </td>
+                            <td>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center">
+                                  <svg
+                                    className="w-3 h-3 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                    />
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                  </svg>
+                                </div>
+                                <span className="text-xs text-gray-900 font-medium">
+                                  {cluster?.location || "Unknown"}
+                                </span>
                               </div>
-                              <span className="text-xs text-gray-900 font-medium">
-                                {cluster?.location || "Unknown"}
-                              </span>
-                            </div>
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="text-center text-sm text-gray-500 py-4"
+                      >
+                        No Kubernetes resource available
+                      </td>
+                    </tr>    
+                  )}
+                </tbody> 
+              </table>  
             )}
           </div>
         </div>
